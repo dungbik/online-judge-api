@@ -10,6 +10,7 @@ import yoonleeverse.onlinejudge.api.user.entity.UserEntity;
 import yoonleeverse.onlinejudge.api.user.repository.UserRepository;
 import yoonleeverse.onlinejudge.security.CurrentUser;
 import yoonleeverse.onlinejudge.security.UserPrincipal;
+import io.swagger.v3.oas.annotations.Parameter;
 
 @RestController
 @RequestMapping(path = "/users")
@@ -20,7 +21,7 @@ public class UserController {
 
     @GetMapping()
     @PreAuthorize("isAuthenticated()")
-    public UserEntity getCurrentUser(@CurrentUser UserPrincipal userPrincipal) {
+    public UserEntity getCurrentUser(@CurrentUser @Parameter(hidden = true) UserPrincipal userPrincipal) {
 
         return userRepository.findByEmail(userPrincipal.getEmail())
                 .orElseThrow(() -> new UsernameNotFoundException("User Not Found"));

@@ -2,12 +2,12 @@ package yoonleeverse.onlinejudge.security;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.web.filter.OncePerRequestFilter;
-import yoonleeverse.onlinejudge.config.AppProperties;
 import yoonleeverse.onlinejudge.util.HeaderUtil;
 
 import javax.servlet.FilterChain;
@@ -29,13 +29,15 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
             FilterChain filterChain)  throws ServletException, IOException {
 
         String tokenStr = HeaderUtil.getAccessToken(request);
-        AuthToken token = tokenProvider.convertAuthToken(tokenStr);
+        if (StringUtils.isNotEmpty(tokenStr)) {
+            AuthToken token = tokenProvider.convertAuthToken(tokenStr);
 
-        if (token.validate()) {
-            UserDetails userDetails = customUserDetailsService.loadUserByUsername(token.getTokenClaims().getSubject());
-            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-            authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+            if (token.validate()) {
+                UserDetails userDetails = customUserDetailsService.loadUserByUsername(token.getTokenClaims().getSubject());
+                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+            }
         }
 
         filterChain.doFilter(request, response);
