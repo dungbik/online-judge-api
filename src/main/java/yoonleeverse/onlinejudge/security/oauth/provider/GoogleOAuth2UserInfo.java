@@ -1,4 +1,6 @@
-package yoonleeverse.onlinejudge.security.oauth;
+package yoonleeverse.onlinejudge.security.oauth.provider;
+
+import yoonleeverse.onlinejudge.security.oauth.OAuth2UserInfo;
 
 import java.util.Map;
 

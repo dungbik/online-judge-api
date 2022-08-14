@@ -14,8 +14,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import yoonleeverse.onlinejudge.api.user.repository.OAuthLinkRedisRepository;
+import yoonleeverse.onlinejudge.api.user.repository.UserRepository;
 import yoonleeverse.onlinejudge.security.*;
-import yoonleeverse.onlinejudge.security.oauth.CustomOAuth2UserService;
 import yoonleeverse.onlinejudge.security.oauth.HttpCookieOAuth2AuthorizationRequestRepository;
 import yoonleeverse.onlinejudge.security.oauth.OAuth2AuthenticationFailureHandler;
 import yoonleeverse.onlinejudge.security.oauth.OAuth2AuthenticationSuccessHandler;
@@ -28,11 +29,11 @@ import java.util.List;
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final CustomUserDetailsService userDetailsService;
-    private final CustomOAuth2UserService oAuth2UserService;
     private final RestAccessDeniedHandler tokenAccessDeniedHandler;
     private final AuthTokenProvider tokenProvider;
     private final HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository;
-    private final AppProperties appProperties;
+    private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
+    private final OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler;
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
@@ -57,17 +58,16 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .oauth2Login()
                 .authorizationEndpoint()
-                .baseUri("/oauth2/authorization")
+                .baseUri("/oauth2/authorize")
                 .authorizationRequestRepository(httpCookieOAuth2AuthorizationRequestRepository)
                 .and()
                 .redirectionEndpoint()
                 .baseUri("/*/oauth2/code/*")
                 .and()
                 .userInfoEndpoint()
-                .userService(oAuth2UserService)
                 .and()
-                .successHandler(oAuth2AuthenticationSuccessHandler())
-                .failureHandler(oAuth2AuthenticationFailureHandler());
+                .successHandler(oAuth2AuthenticationSuccessHandler)
+                .failureHandler(oAuth2AuthenticationFailureHandler);
 
         http.addFilterBefore(tokenAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
     }
@@ -86,20 +86,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Bean
     public TokenAuthenticationFilter tokenAuthenticationFilter() {
         return new TokenAuthenticationFilter(tokenProvider, userDetailsService);
-    }
-
-    @Bean
-    public OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler() {
-        return new OAuth2AuthenticationSuccessHandler(
-                tokenProvider,
-                httpCookieOAuth2AuthorizationRequestRepository,
-                appProperties
-        );
-    }
-
-    @Bean
-    public OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler() {
-        return new OAuth2AuthenticationFailureHandler(httpCookieOAuth2AuthorizationRequestRepository);
     }
 
     @Bean

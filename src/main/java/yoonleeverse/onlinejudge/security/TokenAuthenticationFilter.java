@@ -1,5 +1,6 @@
 package yoonleeverse.onlinejudge.security;
 
+import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -30,10 +31,11 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
 
         String tokenStr = HeaderUtil.getAccessToken(request);
         if (StringUtils.isNotEmpty(tokenStr)) {
-            AuthToken token = tokenProvider.convertAuthToken(tokenStr);
+            Claims claims = tokenProvider.getTokenClaims(tokenStr);
 
-            if (token.validate()) {
-                UserDetails userDetails = customUserDetailsService.loadUserByUsername(token.getTokenClaims().getSubject());
+            boolean isValidated = claims != null;
+            if (isValidated) {
+                UserDetails userDetails = customUserDetailsService.loadUserByUsername(claims.getSubject());
                 UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authentication);

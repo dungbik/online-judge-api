@@ -1,29 +1,45 @@
 package yoonleeverse.onlinejudge.api.user.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import yoonleeverse.onlinejudge.api.user.entity.UserEntity;
-import yoonleeverse.onlinejudge.api.user.repository.UserRepository;
+import org.springframework.web.bind.annotation.*;
+import yoonleeverse.onlinejudge.api.user.dto.*;
+import yoonleeverse.onlinejudge.api.user.service.UserService;
 import yoonleeverse.onlinejudge.security.CurrentUser;
 import yoonleeverse.onlinejudge.security.UserPrincipal;
 import io.swagger.v3.oas.annotations.Parameter;
+
+import javax.validation.Valid;
 
 @RestController
 @RequestMapping(path = "/users")
 @RequiredArgsConstructor
 public class UserController {
 
-    private final UserRepository userRepository;
+    private final UserService userService;
 
-    @GetMapping()
+    @Operation(summary = "현재 로그인된 유저 정보", security = { @SecurityRequirement(name = "Bearer") })
+    @GetMapping
     @PreAuthorize("isAuthenticated()")
-    public UserEntity getCurrentUser(@CurrentUser @Parameter(hidden = true) UserPrincipal userPrincipal) {
+    public CurrentUserResponse getCurrentUser(@CurrentUser @Parameter(hidden = true) UserPrincipal userPrincipal) {
 
-        return userRepository.findByEmail(userPrincipal.getEmail())
-                .orElseThrow(() -> new UsernameNotFoundException("User Not Found"));
+        return userService.getCurrentUser(userPrincipal.getUsername());
     }
+
+    @Operation(summary = "회원가입 요청")
+    @PostMapping
+    public SignUpResponse signUp(@RequestBody @Valid SignUpRequest req) {
+
+        return userService.signUp(req);
+    }
+
+    @Operation(summary = "로그인 요청")
+    @PostMapping("/login")
+    public SignInResponse signIn(@RequestBody @Valid SignInRequest req) {
+
+        return userService.signIn(req);
+    }
+
 }

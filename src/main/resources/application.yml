@@ -4,20 +4,45 @@ spring:
       registration:
         google:
           clientId: ${OAUTH_GOOGLE_CLIENT_ID:id}
-          clientSecret: ${OAUTH_GOOGLE_CLIENT_SECRET:secret}
+          client-secret: ${OAUTH_GOOGLE_CLIENT_SECRET:secret}
           scope:
             - email
             - profile
+        kakao:
+          client-id: ${OAUTH_KAKAO_CLIENT_ID:id}
+          redirect-uri: "{baseUrl}/{action}/oauth2/code/{registrationId}"
+          client-authentication-method: POST
+          authorization-grant-type: authorization_code
+          scope:
+            - profile_nickname
+            - profile_image
+            - account_email
+        github:
+          client-id: f9c4802c93b57105bf35
+          client-secret: 5499e94fa23a6e53c86d4dd504a1e1ab3e46974f
+          scope:
+            - user
+      provider:
+        kakao:
+          authorization-uri: https://kauth.kakao.com/oauth/authorize
+          token-uri: https://kauth.kakao.com/oauth/token
+          user-info-uri: https://kapi.kakao.com/v2/user/me
+          user-name-attribute: id
   data:
     mongodb:
       host: ${MONGO_DB_HOST:localhost}
       port: ${MONGO_DB_PORT:27017}
       database: onlineJudgeDB
+  redis:
+    host: localhost
+    port: 6379
+
 
 app:
   auth:
     tokenSecret: ${TOKEN_SECRET:04ca023b39512e46d0c2cf4b48d5aac61d34302994c87ed4eff225dcf3b0a218739f3897051a057f9b846a69ea2927a587044164b7bae5e1306219d50b588cb1}
-    tokenExpirationMsec: ${TOKEN_EXPIRATION:864000000}
+    accessTokenExp: ${ACCESS_TOKEN_EXPIRATION:3600}
+    refreshTokenExp: ${REFRESH_TOKEN_EXPIRATION:1209600}
   oauth2:
     authorizedRedirectUris:
       - http://localhost:3000/oauth2/redirect
