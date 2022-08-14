@@ -16,8 +16,10 @@ import yoonleeverse.onlinejudge.api.user.repository.TokenStorageRedisRepository;
 import yoonleeverse.onlinejudge.api.user.repository.UserRepository;
 import yoonleeverse.onlinejudge.config.AppProperties;
 import yoonleeverse.onlinejudge.security.AuthTokenProvider;
+import yoonleeverse.onlinejudge.security.UserPrincipal;
 import yoonleeverse.onlinejudge.util.CookieUtil;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.Set;
@@ -136,6 +138,18 @@ public class UserServiceImpl implements UserService {
         response.setSuccess(userComponent.checkName(name));
 
         return response;
+    }
+
+    @Override
+    public APIResponse signOut(HttpServletRequest request, HttpServletResponse response, UserPrincipal userPrincipal) {
+
+        if (userPrincipal != null) {
+            tokenStorageRedisRepository.deleteById(userPrincipal.getUsername());
+        }
+
+        CookieUtil.deleteCookie(request, response, REFRESH_TOKEN);
+
+        return new APIResponse();
     }
 
 }

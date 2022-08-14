@@ -3,7 +3,6 @@ package yoonleeverse.onlinejudge.api.user.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import yoonleeverse.onlinejudge.api.common.dto.APIResponse;
 import yoonleeverse.onlinejudge.api.user.dto.*;
@@ -12,6 +11,7 @@ import yoonleeverse.onlinejudge.security.CurrentUser;
 import yoonleeverse.onlinejudge.security.UserPrincipal;
 import io.swagger.v3.oas.annotations.Parameter;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
@@ -48,6 +48,14 @@ public class UserController {
     public APIResponse checkName(@RequestBody @Valid CheckNameRequest req) {
 
         return userService.checkName(req);
+    }
+
+    @Operation(summary = "로그아웃 요청", security = { @SecurityRequirement(name = "Bearer") })
+    @PostMapping("/logout")
+    public APIResponse signOut(HttpServletRequest request, HttpServletResponse response,
+                               @CurrentUser @Parameter(hidden = true) UserPrincipal userPrincipal) {
+
+        return userService.signOut(request, response, userPrincipal);
     }
 
 }

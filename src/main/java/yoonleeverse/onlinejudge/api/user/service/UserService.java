@@ -2,7 +2,9 @@ package yoonleeverse.onlinejudge.api.user.service;
 
 import yoonleeverse.onlinejudge.api.common.dto.APIResponse;
 import yoonleeverse.onlinejudge.api.user.dto.*;
+import yoonleeverse.onlinejudge.security.UserPrincipal;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 public interface UserService {
@@ -13,4 +15,6 @@ public interface UserService {
     SignInResponse signIn(HttpServletResponse response, SignInRequest req);
 
     APIResponse checkName(CheckNameRequest req);
+
+    APIResponse signOut(HttpServletRequest request, HttpServletResponse response, UserPrincipal userPrincipal);
 }

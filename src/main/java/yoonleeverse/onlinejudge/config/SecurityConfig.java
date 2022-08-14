@@ -32,10 +32,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final CustomUserDetailsService userDetailsService;
     private final RestAccessDeniedHandler tokenAccessDeniedHandler;
-    private final AuthTokenProvider tokenProvider;
     private final HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository;
     private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
     private final OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler;
+    private final TokenAuthenticationFilter tokenAuthenticationFilter;
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
@@ -59,9 +59,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .accessDeniedHandler(tokenAccessDeniedHandler);
 
         http.authorizeRequests()
-                .mvcMatchers(HttpMethod.POST, "/users").anonymous()
-                .mvcMatchers(HttpMethod.POST, "/users/login").anonymous()
-                .mvcMatchers(HttpMethod.POST, "/users/name/*").anonymous()
+                .mvcMatchers(HttpMethod.POST, "/users", "/users/login").anonymous()
+                .mvcMatchers(HttpMethod.POST, "/users/name/*", "/users/logout").permitAll()
                 .anyRequest().authenticated();
 
         http.oauth2Login()
@@ -77,7 +76,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .successHandler(oAuth2AuthenticationSuccessHandler)
                 .failureHandler(oAuth2AuthenticationFailureHandler);
 
-        http.addFilterBefore(tokenAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(tokenAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
     }
 
     @Override
@@ -89,11 +88,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
-    }
-
-    @Bean
-    public TokenAuthenticationFilter tokenAuthenticationFilter() {
-        return new TokenAuthenticationFilter(tokenProvider, userDetailsService);
     }
 
     @Bean
