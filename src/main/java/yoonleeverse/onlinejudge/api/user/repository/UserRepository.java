@@ -13,5 +13,7 @@ public interface UserRepository extends MongoRepository<UserEntity, String>, Cus
     @Query(value = "{ 'links' : { '$elemMatch' : { 'provider' : ?0, 'userId': ?1 } } }")
     Optional<UserEntity> findByProviderAndUserId(String provider, String userId);
 
-    boolean existsByIdOrName(String id, String name);
+    boolean existsByName(String name);
+
+    Optional<UserEntity> findById(String id);
 }

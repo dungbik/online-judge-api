@@ -10,7 +10,7 @@ import javax.validation.constraints.Size;
 @Data
 public class SignUpRequest {
 
-    @Schema(example = "멋쟁이", description = "닉네임")
+    @Schema(example = "멋쟁이", description = "이름")
     @NonNull
     @Size(min = 3, max = 10)
     private String name;

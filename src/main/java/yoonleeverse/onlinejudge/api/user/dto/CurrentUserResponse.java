@@ -1,5 +1,6 @@
 package yoonleeverse.onlinejudge.api.user.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import yoonleeverse.onlinejudge.api.common.dto.APIResponse;
@@ -13,6 +14,8 @@ import java.util.stream.Collectors;
 @Data
 @AllArgsConstructor
 public class CurrentUserResponse extends APIResponse {
+
+    @Schema(description = "유저 정보")
     private UserDTO user;
 
     public static CurrentUserResponse ofSuccess(UserEntity userEntity) {

@@ -6,4 +6,8 @@ public class Constants {
         ROLE_USER,
         ROLE_ADMIN
     }
+
+    public class Cookie {
+        public final static String REFRESH_TOKEN = "x-refresh";
+    }
 }

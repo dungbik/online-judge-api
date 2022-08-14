@@ -5,12 +5,14 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import yoonleeverse.onlinejudge.api.common.dto.APIResponse;
 import yoonleeverse.onlinejudge.api.user.dto.*;
 import yoonleeverse.onlinejudge.api.user.service.UserService;
 import yoonleeverse.onlinejudge.security.CurrentUser;
 import yoonleeverse.onlinejudge.security.UserPrincipal;
 import io.swagger.v3.oas.annotations.Parameter;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 @RestController
@@ -22,7 +24,6 @@ public class UserController {
 
     @Operation(summary = "현재 로그인된 유저 정보", security = { @SecurityRequirement(name = "Bearer") })
     @GetMapping
-    @PreAuthorize("isAuthenticated()")
     public CurrentUserResponse getCurrentUser(@CurrentUser @Parameter(hidden = true) UserPrincipal userPrincipal) {
 
         return userService.getCurrentUser(userPrincipal.getUsername());
@@ -30,16 +31,23 @@ public class UserController {
 
     @Operation(summary = "회원가입 요청")
     @PostMapping
-    public SignUpResponse signUp(@RequestBody @Valid SignUpRequest req) {
+    public SignUpResponse signUp(HttpServletResponse response, @RequestBody @Valid SignUpRequest req) {
 
-        return userService.signUp(req);
+        return userService.signUp(response, req);
     }
 
     @Operation(summary = "로그인 요청")
     @PostMapping("/login")
-    public SignInResponse signIn(@RequestBody @Valid SignInRequest req) {
+    public SignInResponse signIn(HttpServletResponse response, @RequestBody @Valid SignInRequest req) {
 
-        return userService.signIn(req);
+        return userService.signIn(response, req);
+    }
+
+    @Operation(summary = "이름 사용 가능 여부 체크")
+    @PostMapping("/name")
+    public APIResponse checkName(@RequestBody @Valid CheckNameRequest req) {
+
+        return userService.checkName(req);
     }
 
 }
