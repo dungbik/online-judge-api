@@ -6,6 +6,7 @@ import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import yoonleeverse.onlinejudge.api.common.constant.Constants;
 
 @Configuration
 public class OpenAPIConfig {
@@ -22,6 +23,12 @@ public class OpenAPIConfig {
                                 new SecurityScheme()
                                         .type(SecurityScheme.Type.HTTP)
                                         .scheme("Bearer")
+                        )
+                        .addSecuritySchemes("Refresh Token",
+                                new SecurityScheme()
+                                        .type(SecurityScheme.Type.APIKEY)
+                                        .in(SecurityScheme.In.COOKIE)
+                                        .name(Constants.Cookie.REFRESH_TOKEN)
                         )
                 );
     }

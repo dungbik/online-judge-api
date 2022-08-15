@@ -46,3 +46,8 @@ app:
   oauth2:
     authorizedRedirectUris:
       - http://localhost:3000/oauth2/redirect
+
+springdoc:
+  swagger-ui:
+    tagsSorter: alpha
+    operationsSorter: method

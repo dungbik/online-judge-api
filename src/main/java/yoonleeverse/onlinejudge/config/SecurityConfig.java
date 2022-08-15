@@ -108,6 +108,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     public void configure(WebSecurity web) throws Exception {
         web.ignoring()
                 .antMatchers("/v3/api-docs")
+                .antMatchers("/v3/api-docs/*")
+                .mvcMatchers("/swagger-ui/*")
                 .antMatchers("/redoc.html");
     }
 }
