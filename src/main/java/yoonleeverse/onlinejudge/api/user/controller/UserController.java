@@ -1,6 +1,7 @@
 package yoonleeverse.onlinejudge.api.user.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -44,10 +45,10 @@ public class UserController {
     }
 
     @Operation(summary = "이름 사용 가능 여부 체크")
-    @PostMapping("/name")
-    public APIResponse checkName(@RequestBody @Valid CheckNameRequest req) {
+    @GetMapping("/name/{name}")
+    public APIResponse checkName(@PathVariable @Schema(description = "이름") String name) {
 
-        return userService.checkName(req);
+        return userService.checkName(name);
     }
 
     @Operation(summary = "로그아웃 요청", security = { @SecurityRequirement(name = "Bearer") })
@@ -56,6 +57,13 @@ public class UserController {
                                @CurrentUser @Parameter(hidden = true) UserPrincipal userPrincipal) {
 
         return userService.signOut(request, response, userPrincipal);
+    }
+
+    @Operation(summary = "만료된 토큰 갱신", security = { @SecurityRequirement(name = "Refresh Token") })
+    @PostMapping("/refresh")
+    public RefreshTokenResponse refreshToken(HttpServletRequest request, HttpServletResponse response) {
+
+        return userService.refreshToken(request, response);
     }
 
 }

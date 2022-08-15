@@ -59,8 +59,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .accessDeniedHandler(tokenAccessDeniedHandler);
 
         http.authorizeRequests()
-                .mvcMatchers(HttpMethod.POST, "/users", "/users/login").anonymous()
-                .mvcMatchers(HttpMethod.POST, "/users/name/*", "/users/logout").permitAll()
+                .mvcMatchers(HttpMethod.POST, "/users", "/users/login", "/users/name/*", "/users/logout", "/users/refresh").permitAll()
                 .anyRequest().authenticated();
 
         http.oauth2Login()

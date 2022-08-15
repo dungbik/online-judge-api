@@ -14,7 +14,9 @@ public interface UserService {
 
     SignInResponse signIn(HttpServletResponse response, SignInRequest req);
 
-    APIResponse checkName(CheckNameRequest req);
+    APIResponse checkName(String name);
 
     APIResponse signOut(HttpServletRequest request, HttpServletResponse response, UserPrincipal userPrincipal);
+
+    RefreshTokenResponse refreshToken(HttpServletRequest request, HttpServletResponse response);
 }

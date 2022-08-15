@@ -14,11 +14,10 @@ import yoonleeverse.onlinejudge.api.user.entity.UserEntity;
 import yoonleeverse.onlinejudge.api.user.repository.OAuthLinkRedisRepository;
 import yoonleeverse.onlinejudge.api.user.repository.TokenStorageRedisRepository;
 import yoonleeverse.onlinejudge.api.user.repository.UserRepository;
-import yoonleeverse.onlinejudge.config.AppProperties;
-import yoonleeverse.onlinejudge.security.AuthTokenProvider;
 import yoonleeverse.onlinejudge.security.UserPrincipal;
 import yoonleeverse.onlinejudge.util.CookieUtil;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
@@ -34,8 +33,6 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final OAuthLinkRedisRepository oAuthLinkRedisRepository;
-    private final AuthTokenProvider authTokenProvider;
-    private final AppProperties appProperties;
     private final TokenStorageRedisRepository tokenStorageRedisRepository;
     private final UserComponent userComponent;
 
@@ -73,14 +70,7 @@ public class UserServiceImpl implements UserService {
 
         userRepository.save(user);
 
-        String accessToken = authTokenProvider.createAccessToken(id);
-        String refreshToken = authTokenProvider.createRefreshToken(id);
-
-        TokenStorage tokenStorage = new TokenStorage(id, accessToken, refreshToken);
-        tokenStorageRedisRepository.save(tokenStorage);
-
-        int refreshTokenExp = (int) appProperties.getAuth().getRefreshTokenExp();
-        CookieUtil.addCookie(response, REFRESH_TOKEN, refreshToken, refreshTokenExp);
+        String accessToken = userComponent.issueToken(response, id);
 
         return SignUpResponse.ofSuccess(accessToken);
     }
@@ -117,22 +107,13 @@ public class UserServiceImpl implements UserService {
             }
         }
 
-        String accessToken = authTokenProvider.createAccessToken(user.getId());
-        String refreshToken = authTokenProvider.createRefreshToken(user.getId());
-
-        TokenStorage tokenStorage = new TokenStorage(user.getId(), accessToken, refreshToken);
-        tokenStorageRedisRepository.save(tokenStorage);
-
-        int refreshTokenExp = (int) appProperties.getAuth().getRefreshTokenExp();
-        CookieUtil.addCookie(response, REFRESH_TOKEN, refreshToken, refreshTokenExp);
+        String accessToken = userComponent.issueToken(response, user.getId());
 
         return SignInResponse.ofSuccess(accessToken);
     }
 
     @Override
-    public APIResponse checkName(CheckNameRequest req) {
-
-        String name = req.getName();
+    public APIResponse checkName(String name) {
 
         APIResponse response = new APIResponse();
         response.setSuccess(userComponent.checkName(name));
@@ -150,6 +131,29 @@ public class UserServiceImpl implements UserService {
         CookieUtil.deleteCookie(request, response, REFRESH_TOKEN);
 
         return new APIResponse();
+    }
+
+    @Override
+    public RefreshTokenResponse refreshToken(HttpServletRequest request, HttpServletResponse response) {
+
+        Cookie cookie = CookieUtil.getCookie(request, REFRESH_TOKEN)
+                .orElse(null);
+        if (cookie == null) {
+            return RefreshTokenResponse.ofFail();
+        }
+
+        String oldRefreshToken = cookie.getValue();
+        TokenStorage oldTokenStorage = tokenStorageRedisRepository.findByRefreshToken(oldRefreshToken)
+                .orElse(null);
+        if (oldTokenStorage == null) {
+            return RefreshTokenResponse.ofFail();
+        }
+
+        String id = oldTokenStorage.getId();
+        tokenStorageRedisRepository.delete(oldTokenStorage);
+        String accessToken = userComponent.issueToken(response, id);
+
+        return RefreshTokenResponse.ofSuccess(accessToken);
     }
 
 }
