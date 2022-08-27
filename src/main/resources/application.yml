@@ -18,8 +18,8 @@ spring:
             - profile_image
             - account_email
         github:
-          client-id: f9c4802c93b57105bf35
-          client-secret: 5499e94fa23a6e53c86d4dd504a1e1ab3e46974f
+          client-id: ${OAUTH_GITHUB_CLIENT_ID:id}
+          client-secret: ${OAUTH_GITHUB_CLIENT_SECRET:secret}
           scope:
             - user
       provider:
@@ -34,8 +34,8 @@ spring:
       port: ${MONGO_DB_PORT:27017}
       database: onlineJudgeDB
   redis:
-    host: localhost
-    port: 6379
+    host: ${REDIS_HOST:localhost}
+    port: ${REDIS_PORT:6379}
 
 
 app:
@@ -45,7 +45,7 @@ app:
     refreshTokenExp: ${REFRESH_TOKEN_EXPIRATION:1209600}
   oauth2:
     authorizedRedirectUris:
-      - http://localhost:3000/oauth2/redirect
+      - ${OAUTH_REDIRECT_URI:http://localhost:3000/oauth2/redirect}
 
 springdoc:
   swagger-ui:
