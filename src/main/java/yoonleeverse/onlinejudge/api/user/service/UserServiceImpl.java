@@ -44,8 +44,10 @@ public class UserServiceImpl implements UserService {
         String name = req.getName();
         String linkKey = req.getLinkKey();
 
-        userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("이미 사용중인 ID 입니다."));
+        boolean isExistId = userRepository.findById(id).isPresent();
+        if (isExistId) {
+            throw new RuntimeException("이미 사용중인 ID 입니다.");
+        }
 
         boolean checkName = userComponent.checkName(name);
         if (!checkName) {
