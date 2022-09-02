@@ -8,7 +8,7 @@ import org.springframework.data.redis.core.RedisKeyValueAdapter;
 import org.springframework.data.redis.repository.configuration.EnableRedisRepositories;
 
 @SpringBootApplication
-@EnableMongoAuditing
+@EnableMongoAuditing(modifyOnCreate = false)
 @ConfigurationPropertiesScan
 @EnableRedisRepositories(enableKeyspaceEvents = RedisKeyValueAdapter.EnableKeyspaceEvents.ON_STARTUP)
 public class OnlineJudgeApiApplication {
