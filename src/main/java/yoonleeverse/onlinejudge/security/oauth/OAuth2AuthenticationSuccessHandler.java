@@ -52,6 +52,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         return UriComponentsBuilder.fromUriString(targetUrl)
                 .queryParam("newUser", user.isNewUser())
                 .queryParam("linkKey", user.getLinkKey())
+                .queryParam("provider", user.getProvider())
                 .build().toUriString();
     }
 
