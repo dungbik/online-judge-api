@@ -18,13 +18,15 @@ public class LinkOAuth2User implements OAuth2User {
     private Collection<? extends GrantedAuthority> authorities;
     private boolean newUser;
     private String linkKey;
+    private String provider;
 
-    public LinkOAuth2User(OAuth2User user, boolean newUser, String linkKey) {
+    public LinkOAuth2User(OAuth2User user, boolean newUser, String linkKey, String provider) {
         this.name = user.getName();
         this.attributes = user.getAttributes();
         this.authorities = user.getAuthorities();
         this.newUser = newUser;
         this.linkKey = linkKey;
+        this.provider = provider;
     }
 
 }

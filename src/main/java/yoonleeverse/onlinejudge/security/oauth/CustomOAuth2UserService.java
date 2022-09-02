@@ -46,7 +46,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         OAuthLink oAuthLink = new OAuthLink(linkKey, newUser, providerType.name(), userInfo.getId(), userInfo.getEmail(), userInfo.getImageUrl());
         oAuthLinkRedisRepository.save(oAuthLink);
 
-        return new LinkOAuth2User(user, newUser, linkKey);
+        return new LinkOAuth2User(user, newUser, linkKey, providerType.name());
     }
 
 }
