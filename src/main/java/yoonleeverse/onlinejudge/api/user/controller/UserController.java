@@ -25,7 +25,7 @@ public class UserController {
 
     @Operation(summary = "현재 로그인된 유저 정보", security = { @SecurityRequirement(name = "Bearer") })
     @GetMapping
-    public CurrentUserResponse getCurrentUser(@CurrentUser @Parameter(hidden = true) UserPrincipal userPrincipal) {
+    public CurrentUserResponse getCurrentUser(@CurrentUser UserPrincipal userPrincipal) {
 
         return userService.getCurrentUser(userPrincipal.getUsername());
     }
@@ -54,7 +54,7 @@ public class UserController {
     @Operation(summary = "로그아웃 요청", security = { @SecurityRequirement(name = "Bearer") })
     @PostMapping("/logout")
     public APIResponse signOut(HttpServletRequest request, HttpServletResponse response,
-                               @CurrentUser @Parameter(hidden = true) UserPrincipal userPrincipal) {
+                               @CurrentUser UserPrincipal userPrincipal) {
 
         return userService.signOut(request, response, userPrincipal);
     }

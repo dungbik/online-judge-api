@@ -10,4 +10,8 @@ public class Constants {
     public class Cookie {
         public final static String REFRESH_TOKEN = "x-refresh";
     }
+
+    public enum FileExtension {
+        ZIP, PNG, JPG, JPEG
+    }
 }

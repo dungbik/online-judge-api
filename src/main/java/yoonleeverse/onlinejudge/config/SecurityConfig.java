@@ -61,7 +61,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.authorizeRequests()
                 .mvcMatchers(HttpMethod.POST, "/users", "/users/login", "/users/name/*", "/users/logout", "/users/refresh").permitAll()
                 .mvcMatchers(HttpMethod.GET, "/common/*").permitAll()
-                .anyRequest().authenticated();
+//                .anyRequest().authenticated();
+                .anyRequest().permitAll();
 
         http.oauth2Login()
                 .authorizationEndpoint()

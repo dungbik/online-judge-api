@@ -17,7 +17,7 @@ public class SignUpRequest {
 
     @Schema(example = "test1234", description = "아이디")
     @NonNull
-    @Size(min = 6, max = 20)
+    @Size(min = 5, max = 20)
     private String id;
 
     @Schema(example = "test1234", description = "비밀번호")
