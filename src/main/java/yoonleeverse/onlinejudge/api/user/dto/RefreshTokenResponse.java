@@ -1,9 +1,11 @@
 package yoonleeverse.onlinejudge.api.user.dto;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import yoonleeverse.onlinejudge.api.common.dto.APIResponse;
 
 @Data
+@EqualsAndHashCode(callSuper=false)
 public class RefreshTokenResponse extends APIResponse {
 
     public static RefreshTokenResponse ofSuccess(String accessToken) {

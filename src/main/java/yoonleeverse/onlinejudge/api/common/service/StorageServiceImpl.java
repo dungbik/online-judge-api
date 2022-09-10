@@ -1,19 +1,21 @@
 package yoonleeverse.onlinejudge.api.common.service;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
+import org.springframework.util.FileSystemUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 import yoonleeverse.onlinejudge.api.common.constant.Constants.FileExtension;
+import yoonleeverse.onlinejudge.api.problem.entity.TestCase;
+import yoonleeverse.onlinejudge.util.StringUtil;
 
 import javax.annotation.PostConstruct;
 import java.io.*;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -45,19 +47,30 @@ public class StorageServiceImpl implements StorageService {
         }
 
         String extension = StringUtils.getFilenameExtension(file.getOriginalFilename());
-        boolean isCompressedFile = COMPRESSED_FILE_EXTENSION_LIST.stream()
-                .anyMatch(e -> extension.equalsIgnoreCase(e.name()));
         Path targetPath = this.root.resolve(path);
-        if (isCompressedFile) {
-            unzipFile(file, targetPath);
-            return;
-        }
 
         boolean isImageFile = IMAGE_FILE_EXTENSION_LIST.stream()
                 .anyMatch(e -> extension.equalsIgnoreCase(e.name()));
         if (isImageFile) {
             transferTo(file, targetPath);
         }
+    }
+
+    @Override
+    public List<TestCase> loadTestCase(MultipartFile file, String path) {
+        if (file.isEmpty()) {
+            throw new RuntimeException("저장할 파일이 존재하지 않습니다.");
+        }
+
+        String extension = StringUtils.getFilenameExtension(file.getOriginalFilename());
+        boolean isCompressedFile = COMPRESSED_FILE_EXTENSION_LIST.stream()
+                .anyMatch(e -> extension.equalsIgnoreCase(e.name()));
+        Path targetPath = this.root.resolve(path);
+        if (isCompressedFile) {
+            return unzipTestCase(file, targetPath);
+        }
+
+        return null;
     }
 
     @Override
@@ -81,38 +94,51 @@ public class StorageServiceImpl implements StorageService {
         return newFile;
     }
 
-    private void unzipFile(MultipartFile multipartFile, Path targetPath) {
+    private List<TestCase> unzipTestCase(MultipartFile multipartFile, Path targetPath) {
+        Map<Integer, TestCase> testCaseMap = new HashMap<>();
+
         File file = transferTo(multipartFile, targetPath);
         try (ZipInputStream zis = new ZipInputStream(new FileInputStream(file))) {
-            ZipEntry zipEntry = zis.getNextEntry();
-            while (zipEntry != null) {
-                boolean isDirectory = false;
-                if (zipEntry.getName().endsWith(File.separator)) {
-                    isDirectory = true;
-                }
+            ZipEntry zipEntry;
+            while ((zipEntry = zis.getNextEntry()) != null) {
                 Path newPath = zipSlipProtect(zipEntry, targetPath);
-                if (isDirectory) {
-                    Files.createDirectories(newPath);
-                } else {
-                    if (newPath.getParent() != null) {
-                        if (Files.notExists(newPath.getParent())) {
-                            Files.createDirectories(newPath.getParent());
-                        }
-                    }
-                    Files.copy(zis, newPath, StandardCopyOption.REPLACE_EXISTING);
+                String[] splitName = zipEntry.getName().split("\\.");
+                if (zipEntry.isDirectory() || !newPath.getParent().toFile().exists() || splitName.length < 2) {
+                    continue;
                 }
-                zipEntry = zis.getNextEntry();
+                boolean isIn = splitName[1].equalsIgnoreCase("in");
+                boolean isOut = splitName[1].equalsIgnoreCase("out");
+                if (!isIn && !isOut) {
+                    continue;
+                }
+                int id = Integer.parseInt(splitName[0]);
+                String str = new String(zis.readAllBytes());
+                TestCase testCase = testCaseMap.getOrDefault(id, new TestCase(id, null, null, null));
+                if (isIn) {
+                    testCase.setInput(str);
+                } else if (isOut) {
+                    testCase.setOutput(str);
+                    testCase.setOutputMD5(StringUtil.encryptMD5(str));
+                }
+                testCaseMap.put(id, testCase);
             }
             zis.closeEntry();
+
+            List<TestCase> testCases = testCaseMap.values().stream()
+                    .sorted(Comparator.comparingInt(value -> value.getId()))
+                    .collect(Collectors.toList());
+            return testCases;
         } catch (IOException e) {
             e.printStackTrace();
-        }
-
-        if (file.exists()) {
-            if (!file.delete()) {
-                log.warn(String.format("압축파일 삭제를 실패하였습니다. targetPath=%s", targetPath));
+        } finally {
+            try {
+                FileSystemUtils.deleteRecursively(targetPath);
+            } catch (Exception e) {
+                log.warn(String.format("테스트케이스 폴더 삭제를 실패하였습니다. targetPath=%s", targetPath));
             }
         }
+
+        return null;
     }
 
     private Path zipSlipProtect(ZipEntry zipEntry, Path targetDir) throws IOException {

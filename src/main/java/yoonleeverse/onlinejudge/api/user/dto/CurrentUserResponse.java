@@ -3,6 +3,7 @@ package yoonleeverse.onlinejudge.api.user.dto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import yoonleeverse.onlinejudge.api.common.dto.APIResponse;
 import yoonleeverse.onlinejudge.api.user.dto.data.OAuthLinkDTO;
 import yoonleeverse.onlinejudge.api.user.dto.data.UserDTO;
@@ -12,6 +13,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Data
+@EqualsAndHashCode(callSuper=false)
 @AllArgsConstructor
 public class CurrentUserResponse extends APIResponse {
 
