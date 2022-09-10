@@ -19,6 +19,9 @@ public class TestCasePropertyEditor extends PropertyEditorSupport {
     @Override
     public void setAsText(String text) {
         text = "[" + text + "]";
+        text = text.replaceAll("\r\n *\"", "\"");
+        text = text.replaceAll("\" *\r\n", "\"");
+        text = text.replaceAll("\r\n", "\\\\r\\\\n");
         try {
             List<TestCaseExample> testCaseExamples
                     = objectMapper.readValue(text, new TypeReference<List<TestCaseExample>>() {});

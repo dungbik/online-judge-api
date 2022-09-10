@@ -32,11 +32,18 @@ spring:
     mongodb:
       host: ${MONGO_DB_HOST:localhost}
       port: ${MONGO_DB_PORT:27017}
+      username: ${MONGO_DB_USERNAME:username}
+      password: ${MONGO_DB_PASSWORD:password}
       database: onlineJudgeDB
   redis:
     host: ${REDIS_HOST:localhost}
     port: ${REDIS_PORT:6379}
-
+    password: ${REDIS_PASSWORD:pass}
+  rabbitmq:
+    host: ${RABBITMQ_HOST:localhost}
+    port: ${RABBITMQ_PORT:5672}
+    username: ${RABBITMQ_USERNAME:guest}
+    password: ${RABBITMQ_PASSWORD:guest}
 
 app:
   auth:
@@ -51,3 +58,7 @@ springdoc:
   swagger-ui:
     tagsSorter: alpha
     operationsSorter: method
+
+logging:
+  level:
+    yoonleeverse.onlinejudge: debug
