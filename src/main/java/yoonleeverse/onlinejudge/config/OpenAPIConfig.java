@@ -21,7 +21,7 @@ public class OpenAPIConfig {
         localServer.setDescription("local server");
 
         Server alphaServer = new Server();
-        alphaServer.setUrl("https://online-judge-api.yoonleeverse.com");
+        alphaServer.setUrl("http://online-judge-api.yoonleeverse.com");
         alphaServer.setDescription("alpha server");
 
         return new OpenAPI()
