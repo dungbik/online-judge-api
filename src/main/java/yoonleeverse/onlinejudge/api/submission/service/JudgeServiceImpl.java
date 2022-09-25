@@ -72,11 +72,10 @@ public class JudgeServiceImpl implements JudgeService {
                 Map<Integer, String> testCaseMap = testCases.stream()
                         .collect(Collectors.toMap(e -> e.getId(), e -> e.getOutputMD5()));
 
-                Stream<RunResult> runResultStream = completeMessage.getResults().stream()
-                        .filter(runResult -> runResult.getId() > 0);
-
-                ok = runResultStream.count() == testCases.size() &&
-                        runResultStream.allMatch(runResult -> testCaseMap.get(runResult.getId()).equalsIgnoreCase(runResult.getOutput()));
+                ok = (completeMessage.getResults().size() - 1) == testCases.size() &&
+                        completeMessage.getResults().stream()
+                                .filter(runResult -> runResult.getId() > 0)
+                                .allMatch(runResult -> testCaseMap.get(runResult.getId()).equalsIgnoreCase(runResult.getOutput()));
 
                 if (completeMessage.getResults().size() <= 1) {
                     submission.setStatus(JudgeStatus.COMPILE_ERROR);
