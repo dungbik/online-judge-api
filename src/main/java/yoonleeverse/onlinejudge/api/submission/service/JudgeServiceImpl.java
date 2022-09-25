@@ -10,6 +10,7 @@ import yoonleeverse.onlinejudge.api.problem.repository.ProblemRepository;
 import yoonleeverse.onlinejudge.api.problem.repository.TestCaseRedisRepository;
 import yoonleeverse.onlinejudge.api.submission.dto.CompleteMessage;
 import yoonleeverse.onlinejudge.api.submission.dto.JudgeMessage;
+import yoonleeverse.onlinejudge.api.submission.dto.RunResult;
 import yoonleeverse.onlinejudge.api.submission.dto.TestCaseInput;
 import yoonleeverse.onlinejudge.api.submission.entity.JudgeStatus;
 import yoonleeverse.onlinejudge.api.submission.entity.Submission;
@@ -17,6 +18,7 @@ import yoonleeverse.onlinejudge.api.submission.repository.SubmissionRepository;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static yoonleeverse.onlinejudge.config.RabbitMQConfig.EXCHANGE_NAME;
 import static yoonleeverse.onlinejudge.config.RabbitMQConfig.JUDGE_ROUTING_KEY;
@@ -70,14 +72,17 @@ public class JudgeServiceImpl implements JudgeService {
                 Map<Integer, String> testCaseMap = testCases.stream()
                         .collect(Collectors.toMap(e -> e.getId(), e -> e.getOutputMD5()));
 
-                ok = completeMessage.getResults().stream()
-                        .filter(runResult -> runResult.getId() > 0)
-                        .allMatch(runResult -> testCaseMap.get(runResult.getId()).equalsIgnoreCase(runResult.getOutput()));
-            }
-            if (ok) {
-                submission.setStatus(JudgeStatus.RIGHT_ANSWER);
-            } else {
-                submission.setStatus(completeMessage.getResults().size() <= 1 ? JudgeStatus.COMPILE_ERROR : JudgeStatus.WRONG_ANSWER);
+                Stream<RunResult> runResultStream = completeMessage.getResults().stream()
+                        .filter(runResult -> runResult.getId() > 0);
+
+                ok = runResultStream.count() == testCases.size() &&
+                        runResultStream.allMatch(runResult -> testCaseMap.get(runResult.getId()).equalsIgnoreCase(runResult.getOutput()));
+
+                if (completeMessage.getResults().size() <= 1) {
+                    submission.setStatus(JudgeStatus.COMPILE_ERROR);
+                } else {
+                    submission.setStatus(ok ? JudgeStatus.RIGHT_ANSWER : JudgeStatus.WRONG_ANSWER);
+                }
             }
             submissionRepository.save(submission);
         } catch (Exception e) {
