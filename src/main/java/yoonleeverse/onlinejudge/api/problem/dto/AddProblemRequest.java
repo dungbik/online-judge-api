@@ -18,6 +18,7 @@ public class AddProblemRequest {
     private String outputDesc;
     private List<TestCaseExample> testCaseExamples;
     private List<String> languages;
+    private List<String> tags;
 
     private MultipartFile file;
 }

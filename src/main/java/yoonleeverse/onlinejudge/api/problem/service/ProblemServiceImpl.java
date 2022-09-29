@@ -2,14 +2,16 @@ package yoonleeverse.onlinejudge.api.problem.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import yoonleeverse.onlinejudge.api.common.constant.MongoDB;
 import yoonleeverse.onlinejudge.api.common.repository.CounterRepository;
 import yoonleeverse.onlinejudge.api.common.service.StorageService;
 import yoonleeverse.onlinejudge.api.problem.dto.AddProblemRequest;
 import yoonleeverse.onlinejudge.api.problem.dto.AddProblemResponse;
-import yoonleeverse.onlinejudge.api.problem.entity.ProblemEntity;
-import yoonleeverse.onlinejudge.api.problem.entity.ProgrammingLanguage;
+import yoonleeverse.onlinejudge.api.problem.entity.Problem;
+import yoonleeverse.onlinejudge.api.problem.entity.Tag;
 import yoonleeverse.onlinejudge.api.problem.entity.TestCase;
 import yoonleeverse.onlinejudge.api.problem.repository.ProblemRepository;
+import yoonleeverse.onlinejudge.api.problem.repository.TagRepository;
 import yoonleeverse.onlinejudge.api.problem.repository.TestCaseRedisRepository;
 import yoonleeverse.onlinejudge.security.UserPrincipal;
 
@@ -24,6 +26,7 @@ public class ProblemServiceImpl implements ProblemService {
     private final StorageService storageService;
     private final CounterRepository counterRepository;
     private final TestCaseRedisRepository testCaseRedisRepository;
+    private final TagRepository tagRepository;
 
     @Override
     public AddProblemResponse addProblem(UserPrincipal userPrincipal, AddProblemRequest req) {
@@ -35,23 +38,16 @@ public class ProblemServiceImpl implements ProblemService {
                 throw new RuntimeException("이미 존재하는 제목입니다.");
             }
 
-            long problemId = counterRepository.getNextSequence("problems");
+            List<Tag> tags = req.getTags().stream()
+                    .map(this::getTag)
+                    .collect(Collectors.toList());
+
+            long problemId = counterRepository.getNextSequence(MongoDB.PROBLEM);
             List<TestCase> testCases = storageService.loadTestCase(req.getFile(), "problem/" + problemId);
-            ProblemEntity problem = ProblemEntity.builder()
-                    .id(problemId)
-                    .title(req.getTitle())
-                    .timeLimit(req.getTimeLimit())
-                    .memoryLimit(req.getMemoryLimit())
-                    .desc(req.getDesc())
-                    .inputDesc(req.getInputDesc())
-                    .outputDesc(req.getOutputDesc())
-                    .testCaseExamples(req.getTestCaseExamples())
-                    .languages(req.getLanguages().stream()
-                            .map(e -> ProgrammingLanguage.valueOf(e.toUpperCase())).collect(Collectors.toList()))
-                    .testCases(testCases)
-                    .userId(userPrincipal.getId())
-                    .build();
+
+            Problem problem = Problem.makeProblem(problemId, req, testCases, tags, userPrincipal.getId());
             problemRepository.insert(problem);
+            tagRepository.saveAll(tags);
 
             testCaseRedisRepository.save(problemId, testCases);
         } catch (Exception e) {
@@ -60,5 +56,10 @@ public class ProblemServiceImpl implements ProblemService {
         }
 
         return addProblemResponse;
+    }
+
+    private Tag getTag(String name) {
+       return tagRepository.findByName(name)
+               .orElse(Tag.makeTag(counterRepository.getNextSequence(MongoDB.TAG), name));
     }
 }

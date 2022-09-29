@@ -4,13 +4,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
-import yoonleeverse.onlinejudge.api.problem.entity.ProblemEntity;
+import yoonleeverse.onlinejudge.api.problem.entity.Problem;
 import yoonleeverse.onlinejudge.api.problem.entity.TestCase;
 import yoonleeverse.onlinejudge.api.problem.repository.ProblemRepository;
 import yoonleeverse.onlinejudge.api.problem.repository.TestCaseRedisRepository;
 import yoonleeverse.onlinejudge.api.submission.dto.CompleteMessage;
 import yoonleeverse.onlinejudge.api.submission.dto.JudgeMessage;
-import yoonleeverse.onlinejudge.api.submission.dto.RunResult;
 import yoonleeverse.onlinejudge.api.submission.dto.TestCaseInput;
 import yoonleeverse.onlinejudge.api.submission.entity.JudgeStatus;
 import yoonleeverse.onlinejudge.api.submission.entity.Submission;
@@ -18,7 +17,6 @@ import yoonleeverse.onlinejudge.api.submission.repository.SubmissionRepository;
 
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static yoonleeverse.onlinejudge.config.RabbitMQConfig.EXCHANGE_NAME;
 import static yoonleeverse.onlinejudge.config.RabbitMQConfig.JUDGE_ROUTING_KEY;
@@ -36,7 +34,7 @@ public class JudgeServiceImpl implements JudgeService {
     @Override
     public void judge(Submission submission) {
         long problemId = submission.getProblemId();
-        ProblemEntity problem = problemRepository.findById(problemId)
+        Problem problem = problemRepository.findById(problemId)
                 .orElseThrow(() -> new RuntimeException("존재하지 않는 문제입니다."));
 
         JudgeMessage judgeMessage = new JudgeMessage();
