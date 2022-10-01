@@ -1,6 +1,5 @@
 package yoonleeverse.onlinejudge.api.user.dto;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -18,6 +17,5 @@ public class SignInRequest {
     private String password;
 
     @Schema(example = "e5410da7-e23a-4409-8d13-57531eb26332", description = "소셜 계정 로그인 키")
-    @JsonProperty("link_key")
     private String linkKey;
 }

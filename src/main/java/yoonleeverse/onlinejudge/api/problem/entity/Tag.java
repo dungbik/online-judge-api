@@ -1,5 +1,6 @@
 package yoonleeverse.onlinejudge.api.problem.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -18,7 +19,7 @@ import java.util.List;
 public class Tag extends BaseTimeEntity {
     @Id @Setter private Long id;
     private String name;
-    @DBRef(lazy = true) private List<Problem> problems;
+    @DBRef(lazy = true) @JsonIgnore private List<Problem> problems;
 
     public static Tag makeTag(long id, String name) {
         return Tag.builder()
