@@ -1,14 +1,13 @@
 package yoonleeverse.onlinejudge.api.problem.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import yoonleeverse.onlinejudge.api.common.constant.MongoDB;
 import yoonleeverse.onlinejudge.api.common.repository.CounterRepository;
 import yoonleeverse.onlinejudge.api.common.service.StorageService;
-import yoonleeverse.onlinejudge.api.problem.dto.AddProblemRequest;
-import yoonleeverse.onlinejudge.api.problem.dto.AddProblemResponse;
-import yoonleeverse.onlinejudge.api.problem.dto.GetProblemResponse;
+import yoonleeverse.onlinejudge.api.problem.dto.*;
 import yoonleeverse.onlinejudge.api.problem.entity.*;
 import yoonleeverse.onlinejudge.api.problem.mapper.ProblemMapper;
 import yoonleeverse.onlinejudge.api.problem.repository.ProblemRepository;
@@ -59,6 +58,21 @@ public class ProblemServiceImpl implements ProblemService {
                 .orElseThrow(() -> new RuntimeException("존재하지 않는 문제입니다."));
 
         return problemMapper.toDto(problem);
+    }
+
+    @Override
+    public GetAllProblemResponse getAllProblem(GetAllProblemRequest req) {
+        Page<Problem> problemPage = this.problemRepository.getAllProblem(req);
+        int problemSize = problemPage.getNumberOfElements();
+
+        GetAllProblemResponse response = new GetAllProblemResponse();
+        if (problemSize > 0) {
+            List<Problem> problems = problemPage.getContent();
+            response.setProblems(problemMapper.toDtoList(problems));
+            response.setPage(problemMapper.toPageDto(problemPage));
+        }
+
+        return response;
     }
 
     private Tag findOrMakeTag(String name) {
