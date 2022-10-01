@@ -3,7 +3,6 @@ package yoonleeverse.onlinejudge.config;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.BeanIds;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -16,8 +15,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import yoonleeverse.onlinejudge.api.user.repository.OAuthLinkRedisRepository;
-import yoonleeverse.onlinejudge.api.user.repository.UserRepository;
 import yoonleeverse.onlinejudge.security.*;
 import yoonleeverse.onlinejudge.security.oauth.HttpCookieOAuth2AuthorizationRequestRepository;
 import yoonleeverse.onlinejudge.security.oauth.OAuth2AuthenticationFailureHandler;
@@ -59,9 +56,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .accessDeniedHandler(tokenAccessDeniedHandler);
 
         http.authorizeRequests()
-                .mvcMatchers(HttpMethod.POST, "/users", "/users/login", "/users/name/*", "/users/logout", "/users/refresh").permitAll()
-                .mvcMatchers(HttpMethod.GET, "/common/health").permitAll()
-                .anyRequest().authenticated();
+                .anyRequest().permitAll();
 
         http.oauth2Login()
                 .authorizationEndpoint()
