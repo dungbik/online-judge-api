@@ -63,13 +63,13 @@ public class ProblemServiceImpl implements ProblemService {
     @Override
     public GetAllProblemResponse getAllProblem(GetAllProblemRequest req) {
         Page<Problem> problemPage = this.problemRepository.getAllProblem(req);
-        int problemSize = problemPage.getNumberOfElements();
 
         GetAllProblemResponse response = new GetAllProblemResponse();
-        if (problemSize > 0) {
+        response.setPage(problemMapper.toPageDto(problemPage));
+
+        if (!problemPage.isEmpty()) {
             List<Problem> problems = problemPage.getContent();
             response.setProblems(problemMapper.toDtoList(problems));
-            response.setPage(problemMapper.toPageDto(problemPage));
         }
 
         return response;
