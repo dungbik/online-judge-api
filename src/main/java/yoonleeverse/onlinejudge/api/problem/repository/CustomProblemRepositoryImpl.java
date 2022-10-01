@@ -40,7 +40,7 @@ public class CustomProblemRepositoryImpl implements CustomProblemRepository {
             criteria.and("title").regex(title, "i");
         }
         if (!CollectionUtils.isEmpty(languages)) {
-            criteria.and("languages").all(languages);
+            criteria.and("languages").in(languages);
         }
         if (!CollectionUtils.isEmpty(tags)) {
             criteria.and("tags").in(tags.stream().map((id) -> Tag.builder().id(id).build()).collect(Collectors.toList()));
