@@ -48,5 +48,14 @@ public class ProblemController {
         return problemService.removeProblem(userPrincipal, id);
     }
 
+    @Operation(summary = "문제 수정", security = { @SecurityRequirement(name = "Bearer") })
+    @PreAuthorize("hasRole('ADMIN')")
+    @PutMapping(value = "/{id}", consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
+    public APIResponse updateProblem(@CurrentUser UserPrincipal userPrincipal,
+                                     @PathVariable Long id,
+                                     @RequestPart AddProblemRequest req,
+                                     @RequestPart MultipartFile file) {
+        return problemService.updateProblem(userPrincipal, id, req, file);
+    }
 
 }
