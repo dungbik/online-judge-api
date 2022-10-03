@@ -86,6 +86,13 @@ public class ProblemServiceImpl implements ProblemService {
         return problem;
     }
 
+    /**
+     * 추가/수정하려는 문제 정보를 검증 후, 실제로 등록/갱신을 수행한다.
+     * @param problem null 일 경우 새로운 문제 생성, 아닐 경우 문제 수정
+     * @param req 문제를 추가하기 위한 정보
+     * @param file 테스트케이스 압축파일
+     * @param userId 문제를 추가한 유저의 아이디
+     */
     private void addProblem(Problem problem, AddProblemRequest req, MultipartFile file, String userId) {
         this.checkIfExistingTitle(req);
 

@@ -18,11 +18,6 @@ public class CustomCounterRepositoryImpl implements CustomCounterRepository {
 
     private final MongoTemplate mongoTemplate;
 
-    /**
-     * get Auto Increment Seq By CollectionName (starting from 1)
-     * @param collectionName
-     * @return Seq
-     */
     @Override
     public long getNextSequence(String collectionName) {
         Query query = query(where("_id").is(collectionName));
