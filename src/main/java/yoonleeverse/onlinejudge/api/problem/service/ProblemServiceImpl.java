@@ -33,16 +33,14 @@ public class ProblemServiceImpl implements ProblemService {
 
     @Override
     public AddProblemResponse addProblem(UserPrincipal userPrincipal, AddProblemRequest req, MultipartFile file) {
-        checkIfExistingTitle(req);
-        makeProblem(req, file, userPrincipal.getId());
+        this.addProblem(null, req, file, userPrincipal.getId());
 
         return new AddProblemResponse();
     }
 
     @Override
     public GetProblemResponse getProblem(Long id) {
-        Problem problem = this.problemRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("존재하지 않는 문제입니다."));
+        Problem problem = this.findProblem(id);
 
         return this.problemMapper.toDto(problem);
     }
@@ -64,10 +62,9 @@ public class ProblemServiceImpl implements ProblemService {
 
     @Override
     public APIResponse removeProblem(UserPrincipal userPrincipal, Long id) {
-        Problem problem = this.problemRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("존재하지 않는 문제입니다."));
+        Problem problem = this.findProblem(id);
 
-        removeProblemFromTags(problem);
+        this.removeProblemFromTags(problem);
 
         this.testCaseRedisRepository.delete(problem.getId());
         this.problemRepository.delete(problem);
@@ -75,28 +72,55 @@ public class ProblemServiceImpl implements ProblemService {
         return new APIResponse();
     }
 
-    private void checkIfExistingTitle(AddProblemRequest req) {
-        boolean isExistTitle = this.problemRepository.existsByTitle(req.getTitle());
-        if (isExistTitle) {
-            throw new RuntimeException("이미 존재하는 제목입니다.");
-        }
+    @Override
+    public APIResponse updateProblem(UserPrincipal userPrincipal, Long id, AddProblemRequest req, MultipartFile file) {
+        Problem problem = this.findProblem(id);
+        this.addProblem(problem, req, file, userPrincipal.getId());
+
+        return new APIResponse();
     }
 
-    private void makeProblem(AddProblemRequest req, MultipartFile file, String userId) {
-        long problemId = this.counterRepository.getNextSequence(MongoDB.PROBLEM);
+    private Problem findProblem(Long id) {
+        Problem problem = this.problemRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("존재하지 않는 문제입니다."));
+        return problem;
+    }
 
-        Problem problem = this.problemMapper.toEntity(req);
+    private void addProblem(Problem problem, AddProblemRequest req, MultipartFile file, String userId) {
+        this.checkIfExistingTitle(req);
+
+        boolean isNew = problem == null;
+        long problemId = isNew ? this.counterRepository.getNextSequence(MongoDB.PROBLEM) : problem.getId();
+
+        problem = this.problemMapper.toEntity(req);
         problem.setId(problemId);
 
         List<TestCase> testCases = this.storageService.loadTestCase(file, "problem/" + problemId);
         problem.setTestCases(testCases);
 
-        List<Tag> tags = addProblemFromTags(problem, req.getTags());
+        List<Tag> tags = this.addProblemFromTags(problem, req.getTags());
         problem.setTags(tags);
         problem.setUserId(userId);
 
+        if (!isNew) {
+            this.removeProblemFromTags(problem);
+            this.testCaseRedisRepository.delete(problemId);
+        }
+
         this.testCaseRedisRepository.save(problemId, testCases);
-        this.problemRepository.insert(problem);
+
+        if (isNew) {
+            this.problemRepository.insert(problem);
+        } else {
+            this.problemRepository.save(problem);
+        }
+    }
+
+    private void checkIfExistingTitle(AddProblemRequest req) {
+        boolean isExistTitle = this.problemRepository.existsByTitle(req.getTitle());
+        if (isExistTitle) {
+            throw new RuntimeException("이미 존재하는 제목입니다.");
+        }
     }
 
     private List<Tag> addProblemFromTags(Problem problem, List<String> tagNames) {
@@ -108,8 +132,7 @@ public class ProblemServiceImpl implements ProblemService {
                 })
                 .collect(Collectors.toList());
 
-        this.tagRepository.saveAll(tags);
-        return tags;
+        return this.tagRepository.saveAll(tags);
     }
 
     private Tag findOrMakeTag(String name) {

@@ -13,4 +13,6 @@ public interface ProblemService {
     GetAllProblemResponse getAllProblem(GetAllProblemRequest req);
 
     APIResponse removeProblem(UserPrincipal userPrincipal, Long id);
+
+    APIResponse updateProblem(UserPrincipal userPrincipal, Long id, AddProblemRequest req, MultipartFile file);
 }
