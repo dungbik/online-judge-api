@@ -8,10 +8,11 @@ import yoonleeverse.onlinejudge.api.common.dto.PagingResponse;
 import yoonleeverse.onlinejudge.api.problem.dto.AddProblemRequest;
 import yoonleeverse.onlinejudge.api.problem.dto.GetProblemResponse;
 import yoonleeverse.onlinejudge.api.problem.entity.Problem;
+import yoonleeverse.onlinejudge.api.problem.entity.SubmissionHistory;
 
 import java.util.List;
 
-@Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
+@Mapper(componentModel = MappingConstants.ComponentModel.SPRING, imports = SubmissionHistory.class)
 public interface ProblemMapper {
     GetProblemResponse toDto(Problem source);
 
@@ -23,6 +24,7 @@ public interface ProblemMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "testCases", ignore = true)
     @Mapping(target = "tags", ignore = true)
+    @Mapping(target = "submissionHistory", expression = "java(new SubmissionHistory())")
     @Mapping(target = "userId", ignore = true)
     Problem toEntity(AddProblemRequest source);
 }

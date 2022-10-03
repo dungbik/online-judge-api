@@ -55,14 +55,18 @@ public class JudgeServiceImpl implements JudgeService {
 
             log.debug("judge {}", judgeMessage);
             rabbitTemplate.convertAndSend(EXCHANGE_NAME, JUDGE_ROUTING_KEY, judgeMessage);
+            problem.getSubmissionHistory().addTotalCount();
+            this.problemRepository.save(problem);
         }
     }
 
     @Override
     public void completeJudge(CompleteMessage completeMessage) {
         boolean ok = false;
+        Submission submission = null;
+
         try {
-            Submission submission = submissionRepository.findById(completeMessage.getSubmissionId())
+            submission = submissionRepository.findById(completeMessage.getSubmissionId())
                     .orElseThrow(() -> new RuntimeException("존재하지 않는 제출내역입니다."));
 
             List<TestCase> testCases = testCaseRedisRepository.find(completeMessage.getProblemId());
@@ -77,14 +81,25 @@ public class JudgeServiceImpl implements JudgeService {
 
                 if (completeMessage.getResults().size() <= 1) {
                     submission.setStatus(JudgeStatus.COMPILE_ERROR);
+                } else if (ok) {
+                    submission.setStatus(JudgeStatus.RIGHT_ANSWER);
+
+                    Problem problem = problemRepository.findById(submission.getProblemId())
+                            .orElseThrow(() -> new RuntimeException("존재하지 않는 문제입니다."));
+                    problem.getSubmissionHistory().addSuccessCount();
+                    this.problemRepository.save(problem);
                 } else {
-                    submission.setStatus(ok ? JudgeStatus.RIGHT_ANSWER : JudgeStatus.WRONG_ANSWER);
+                    // todo 런타임 에러, 시간 초과 등과 같이 다른 실패 사유도 처리되게 해야함
+                    submission.setStatus(JudgeStatus.WRONG_ANSWER);
                 }
             }
-            submissionRepository.save(submission);
         } catch (Exception e) {
+            submission.setStatus(JudgeStatus.FAIL);
             log.debug("{}", e.getMessage());
         } finally {
+            if (submission != null) {
+                this.submissionRepository.save(submission);
+            }
             log.debug("completeJudge {} {}", ok, completeMessage);
         }
     }
