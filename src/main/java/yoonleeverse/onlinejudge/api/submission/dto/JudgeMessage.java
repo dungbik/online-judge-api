@@ -1,6 +1,7 @@
 package yoonleeverse.onlinejudge.api.submission.dto;
 
 import lombok.Data;
+import yoonleeverse.onlinejudge.api.problem.entity.ProgrammingLanguage;
 
 import java.io.Serializable;
 import java.util.List;
@@ -13,6 +14,6 @@ public class JudgeMessage implements Serializable {
     private int maxRealTime;
     private int maxMemory;
     private List<TestCaseInput> inputs;
-    private String language;
+    private ProgrammingLanguage language;
     private String code;
 }
