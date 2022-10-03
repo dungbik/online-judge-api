@@ -30,4 +30,8 @@ public class Tag extends BaseTimeEntity {
     public void addProblem(Problem problem) {
         this.problems.add(problem);
     }
+
+    public void removeProblem(Problem problem) {
+        this.problems.remove(problem);
+    }
 }
