@@ -7,6 +7,7 @@ import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import yoonleeverse.onlinejudge.api.common.dto.APIResponse;
 import yoonleeverse.onlinejudge.api.problem.dto.*;
 import yoonleeverse.onlinejudge.api.problem.service.ProblemService;
 import yoonleeverse.onlinejudge.security.CurrentUser;
@@ -37,6 +38,14 @@ public class ProblemController {
     @GetMapping
     public GetAllProblemResponse getAllProblem(GetAllProblemRequest req) {
         return problemService.getAllProblem(req);
+    }
+
+    @Operation(summary = "문제 삭제", security = { @SecurityRequirement(name = "Bearer") })
+    @PreAuthorize("hasRole('ADMIN')")
+    @DeleteMapping("/{id}")
+    public APIResponse removeProblem(@CurrentUser UserPrincipal userPrincipal,
+                                     @PathVariable Long id) {
+        return problemService.removeProblem(userPrincipal, id);
     }
 
 
