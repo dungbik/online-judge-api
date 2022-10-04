@@ -31,6 +31,8 @@ public class Problem extends BaseTimeEntity {
     private List<TestCase> testCases;
     @DBRef private List<Tag> tags;
 
+    private SubmissionHistory submissionHistory;
+
     private String userId;
 
     public void setTestCases(List<TestCase> testCases) {

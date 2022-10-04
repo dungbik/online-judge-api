@@ -28,7 +28,7 @@ public class SubmissionServiceImpl implements SubmissionService {
 
             submission = Submission.builder()
                     .problemId(req.getProblemId())
-                    .language(language.name())
+                    .language(language)
                     .code(req.getCode())
                     .userId(userPrincipal.getId())
                     .status(JudgeStatus.PENDING)

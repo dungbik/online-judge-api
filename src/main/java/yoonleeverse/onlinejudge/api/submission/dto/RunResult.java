@@ -15,4 +15,5 @@ public class RunResult implements Serializable {
     private int error;
     private int result;
     private String output;
+    private String outputMD5;
 }
