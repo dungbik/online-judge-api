@@ -1,5 +1,6 @@
 package yoonleeverse.onlinejudge.api.problem.repository;
 
+import com.mongodb.client.result.UpdateResult;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
@@ -9,6 +10,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.util.CollectionUtils;
 import yoonleeverse.onlinejudge.api.problem.dto.GetAllProblemRequest;
@@ -56,5 +58,16 @@ public class CustomProblemRepositoryImpl implements CustomProblemRepository {
         );
 
         return problemPage;
+    }
+
+    @Override
+    public UpdateResult addSuccessCount(long problemId) {
+        Criteria criteria = Criteria.where("id").is(problemId);
+        Query query = Query.query(criteria);
+
+        Update update = new Update();
+        update.inc("submissionHistory.successCount", 1);
+
+        return this.mongoTemplate.updateFirst(query, update, Problem.class);
     }
 }

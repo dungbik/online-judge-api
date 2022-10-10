@@ -2,6 +2,7 @@ package yoonleeverse.onlinejudge.api.submission.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
+import yoonleeverse.onlinejudge.api.problem.entity.ProgrammingLanguage;
 
 @Data
 public class SubmitProblemRequest {
@@ -9,8 +10,8 @@ public class SubmitProblemRequest {
     @Schema(example = "1")
     private long problemId;
 
-    @Schema(example = "C")
-    private String language;
+    @Schema(description = "채점 가능 언어", enumAsRef = true)
+    private ProgrammingLanguage language;
 
     @Schema(example = "#include <stdio.h>\n" +
             "int main(int argc, char *argv[]) {\n" +
