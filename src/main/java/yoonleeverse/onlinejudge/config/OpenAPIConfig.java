@@ -30,12 +30,8 @@ public class OpenAPIConfig {
 
     @Bean
     public OpenAPI openAPI() {
-        Server localServer = new Server();
-        localServer.setUrl("http://localhost:8080");
-        localServer.setDescription("local server");
-
         Server alphaServer = new Server();
-        alphaServer.setUrl("http://online-judge-api.yoonleeverse.com");
+        alphaServer.setUrl("https://online-judge-api.yoonleeverse.com");
         alphaServer.setDescription("alpha server");
 
         return new OpenAPI()
@@ -56,7 +52,7 @@ public class OpenAPIConfig {
                                         .name(Constants.Cookie.REFRESH_TOKEN)
                         )
                 )
-                .servers(List.of(localServer, alphaServer));
+                .servers(List.of(alphaServer));
     }
 
 }
