@@ -10,6 +10,7 @@ import yoonleeverse.onlinejudge.api.problem.repository.ProblemRepository;
 import yoonleeverse.onlinejudge.api.problem.repository.TestCaseRedisRepository;
 import yoonleeverse.onlinejudge.api.submission.dto.CompleteMessage;
 import yoonleeverse.onlinejudge.api.submission.dto.JudgeMessage;
+import yoonleeverse.onlinejudge.api.submission.dto.RunResult;
 import yoonleeverse.onlinejudge.api.submission.dto.TestCaseInput;
 import yoonleeverse.onlinejudge.api.submission.entity.JudgeStatus;
 import yoonleeverse.onlinejudge.api.submission.entity.Submission;
@@ -34,7 +35,7 @@ public class JudgeServiceImpl implements JudgeService {
     @Override
     public void judge(Submission submission) {
         long problemId = submission.getProblemId();
-        Problem problem = problemRepository.findById(problemId)
+        Problem problem = this.problemRepository.findById(problemId)
                 .orElseThrow(() -> new RuntimeException("존재하지 않는 문제입니다."));
 
         JudgeMessage judgeMessage = new JudgeMessage();
@@ -46,7 +47,7 @@ public class JudgeServiceImpl implements JudgeService {
         judgeMessage.setCode(submission.getCode());
         judgeMessage.setLanguage(submission.getLanguage());
 
-        List<TestCase> testCases = testCaseRedisRepository.find(problemId);
+        List<TestCase> testCases = this.testCaseRedisRepository.find(problemId);
         if (testCases != null) {
             List<TestCaseInput> list = testCases.stream()
                     .map(e -> new TestCaseInput(e.getId(), e.getInput()))
@@ -54,7 +55,7 @@ public class JudgeServiceImpl implements JudgeService {
             judgeMessage.setInputs(list);
 
             log.debug("judge {}", judgeMessage);
-            rabbitTemplate.convertAndSend(EXCHANGE_NAME, JUDGE_ROUTING_KEY, judgeMessage);
+            this.rabbitTemplate.convertAndSend(EXCHANGE_NAME, JUDGE_ROUTING_KEY, judgeMessage);
             problem.getSubmissionHistory().addTotalCount();
             this.problemRepository.save(problem);
         }
@@ -66,35 +67,36 @@ public class JudgeServiceImpl implements JudgeService {
         Submission submission = null;
 
         try {
-            submission = submissionRepository.findById(completeMessage.getSubmissionId())
+            submission = this.submissionRepository.findById(completeMessage.getSubmissionId())
                     .orElseThrow(() -> new RuntimeException("존재하지 않는 제출내역입니다."));
 
-            List<TestCase> testCases = testCaseRedisRepository.find(completeMessage.getProblemId());
+            List<TestCase> testCases = this.testCaseRedisRepository.find(completeMessage.getProblemId());
             if (testCases != null) {
-                Map<Integer, String> testCaseMap = testCases.stream()
-                        .collect(Collectors.toMap(e -> e.getId(), e -> e.getOutputMD5()));
+                for (RunResult runResult : completeMessage.getResults()) {
+                    if (runResult.getResult() != JudgeStatus.SUCCESS.getValue()) {
+                        submission.setStatus(JudgeStatus.valueOf(runResult.getResult()));
+                        break;
+                    }
+                }
 
-                ok = (completeMessage.getResults().size() - 1) == testCases.size() &&
-                        completeMessage.getResults().stream()
-                                .filter(runResult -> runResult.getId() > 0)
-                                .allMatch(runResult -> testCaseMap.get(runResult.getId()).equalsIgnoreCase(runResult.getOutputMD5()));
+                if (submission.getStatus() == JudgeStatus.PENDING) {
+                    Map<Integer, String> testCaseMap = testCases.stream()
+                            .collect(Collectors.toMap(e -> e.getId(), e -> e.getOutputMD5()));
+                    ok = (completeMessage.getResults().size() - 1) == testCases.size() &&
+                            completeMessage.getResults().stream()
+                                    .filter(runResult -> runResult.getId() > 0)
+                                    .allMatch(runResult -> testCaseMap.get(runResult.getId()).equalsIgnoreCase(runResult.getOutputMD5()));
 
-                if (completeMessage.getResults().size() <= 1) {
-                    submission.setStatus(JudgeStatus.COMPILE_ERROR);
-                } else if (ok) {
-                    submission.setStatus(JudgeStatus.RIGHT_ANSWER);
-
-                    Problem problem = problemRepository.findById(submission.getProblemId())
-                            .orElseThrow(() -> new RuntimeException("존재하지 않는 문제입니다."));
-                    problem.getSubmissionHistory().addSuccessCount();
-                    this.problemRepository.save(problem);
-                } else {
-                    // todo 런타임 에러, 시간 초과 등과 같이 다른 실패 사유도 처리되게 해야함
-                    submission.setStatus(JudgeStatus.WRONG_ANSWER);
+                    if (ok) {
+                        submission.setStatus(JudgeStatus.SUCCESS);
+                        this.problemRepository.addSuccessCount(submission.getProblemId());
+                    } else {
+                        submission.setStatus(JudgeStatus.WRONG_ANSWER);
+                    }
                 }
             }
         } catch (Exception e) {
-            submission.setStatus(JudgeStatus.FAIL);
+            submission.setStatus(JudgeStatus.UNK_ERROR);
             log.debug("{}", e.getMessage());
         } finally {
             if (submission != null) {

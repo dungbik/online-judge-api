@@ -22,4 +22,8 @@ public class Submission extends BaseTimeEntity {
     public void setStatus(JudgeStatus status) {
         this.status = status;
     }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
 }
