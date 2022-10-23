@@ -2,11 +2,13 @@ package yoonleeverse.onlinejudge.api.user.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
 
 import javax.validation.constraints.Size;
 
 @Data
+@NoArgsConstructor
 public class SignUpRequest {
 
     @Schema(example = "멋쟁이", description = "이름")
