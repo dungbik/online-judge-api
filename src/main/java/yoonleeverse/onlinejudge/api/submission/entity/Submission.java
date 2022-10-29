@@ -18,9 +18,14 @@ public class Submission extends BaseTimeEntity {
     private String code;
     private ProgrammingLanguage language;
     private JudgeStatus status;
+    private Long memory; // byte
+    private Integer realTime; // ms
+    private Integer codeLength;
 
-    public void setStatus(JudgeStatus status) {
+    public void setStatus(JudgeStatus status, Long memory, Integer realTime) {
         this.status = status;
+        this.memory = memory;
+        this.realTime = realTime;
     }
 
     public void setUserId(String userId) {

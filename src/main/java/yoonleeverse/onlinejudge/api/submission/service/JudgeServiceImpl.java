@@ -74,7 +74,7 @@ public class JudgeServiceImpl implements JudgeService {
             if (testCases != null) {
                 for (RunResult runResult : completeMessage.getResults()) {
                     if (runResult.getResult() != JudgeStatus.SUCCESS.getValue()) {
-                        submission.setStatus(JudgeStatus.valueOf(runResult.getResult()));
+                        submission.setStatus(JudgeStatus.valueOf(runResult.getResult()), null, null);
                         break;
                     }
                 }
@@ -88,15 +88,21 @@ public class JudgeServiceImpl implements JudgeService {
                                     .allMatch(runResult -> testCaseMap.get(runResult.getId()).equalsIgnoreCase(runResult.getOutputMD5()));
 
                     if (ok) {
-                        submission.setStatus(JudgeStatus.SUCCESS);
+                        long maxMemory = 0;
+                        int maxRealTime = 0;
+                        for (RunResult runResult : completeMessage.getResults()) {
+                            maxMemory = Math.max(maxMemory, runResult.getMemory());
+                            maxRealTime =  Math.max(maxRealTime, runResult.getReal_time());
+                        }
+                        submission.setStatus(JudgeStatus.SUCCESS, maxMemory, maxRealTime);
                         this.problemRepository.addSuccessCount(submission.getProblemId());
                     } else {
-                        submission.setStatus(JudgeStatus.WRONG_ANSWER);
+                        submission.setStatus(JudgeStatus.WRONG_ANSWER, null, null);
                     }
                 }
             }
         } catch (Exception e) {
-            submission.setStatus(JudgeStatus.UNK_ERROR);
+            submission.setStatus(JudgeStatus.UNK_ERROR, null, null);
             log.debug("{}", e.getMessage());
         } finally {
             if (submission != null) {

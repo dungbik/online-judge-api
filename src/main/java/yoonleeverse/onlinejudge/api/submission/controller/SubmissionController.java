@@ -4,6 +4,9 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import yoonleeverse.onlinejudge.api.problem.dto.GetAllProblemRequest;
+import yoonleeverse.onlinejudge.api.submission.dto.GetAllSubmissionRequest;
+import yoonleeverse.onlinejudge.api.submission.dto.GetAllSubmissionResponse;
 import yoonleeverse.onlinejudge.api.submission.dto.SubmitProblemRequest;
 import yoonleeverse.onlinejudge.api.submission.dto.SubmitProblemResponse;
 import yoonleeverse.onlinejudge.api.submission.service.SubmissionService;
@@ -23,4 +26,11 @@ public class SubmissionController {
                                                @RequestBody SubmitProblemRequest req) {
          return submissionService.submitProblem(userPrincipal, req);
     }
+
+    @Operation(summary = "채점 제출 이력 보기")
+    @GetMapping
+    public GetAllSubmissionResponse getAllSubmission(GetAllSubmissionRequest req) {
+        return this.submissionService.getAllSubmission(req);
+    }
+
 }
