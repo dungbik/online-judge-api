@@ -1,14 +1,19 @@
 package yoonleeverse.onlinejudge.api.submission.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import yoonleeverse.onlinejudge.api.problem.entity.ProgrammingLanguage;
+import yoonleeverse.onlinejudge.api.submission.dto.GetAllSubmissionRequest;
+import yoonleeverse.onlinejudge.api.submission.dto.GetAllSubmissionResponse;
 import yoonleeverse.onlinejudge.api.submission.dto.SubmitProblemRequest;
 import yoonleeverse.onlinejudge.api.submission.dto.SubmitProblemResponse;
 import yoonleeverse.onlinejudge.api.submission.entity.Submission;
 import yoonleeverse.onlinejudge.api.submission.mapper.SubmissionMapper;
 import yoonleeverse.onlinejudge.api.submission.repository.SubmissionRepository;
 import yoonleeverse.onlinejudge.security.UserPrincipal;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -29,6 +34,22 @@ public class SubmissionServiceImpl implements SubmissionService {
 
         return new SubmitProblemResponse();
     }
+
+    @Override
+    public GetAllSubmissionResponse getAllSubmission(GetAllSubmissionRequest req) {
+        Page<Submission> submissionPage = this.submissionRepository.getAllSubmission(req);
+
+        GetAllSubmissionResponse response = new GetAllSubmissionResponse();
+        response.setPage(this.submissionMapper.toPageDto(submissionPage));
+
+        if (!submissionPage.isEmpty()) {
+            List<Submission> problems = submissionPage.getContent();
+            response.setSubmissions(this.submissionMapper.toDtoList(problems));
+        }
+
+        return response;
+    }
+
 
     private static void validateSubmitProblemReq(SubmitProblemRequest req) {
         ProgrammingLanguage language = req.getLanguage();
