@@ -1,13 +1,15 @@
 package yoonleeverse.onlinejudge.api.user;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.web.server.Cookie;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Component;
 import yoonleeverse.onlinejudge.api.user.entity.TokenStorage;
 import yoonleeverse.onlinejudge.api.user.repository.TokenStorageRedisRepository;
 import yoonleeverse.onlinejudge.api.user.repository.UserRepository;
 import yoonleeverse.onlinejudge.config.AppProperties;
 import yoonleeverse.onlinejudge.security.AuthTokenProvider;
-import yoonleeverse.onlinejudge.util.CookieUtil;
 
 import javax.servlet.http.HttpServletResponse;
 import java.util.regex.Pattern;
@@ -60,7 +62,16 @@ public class UserComponent {
         tokenStorageRedisRepository.save(tokenStorage);
 
         int refreshTokenExp = (int) appProperties.getAuth().getRefreshTokenExp();
-        CookieUtil.addCookie(response, REFRESH_TOKEN, refreshToken, refreshTokenExp);
+
+        ResponseCookie cookie = ResponseCookie.from(REFRESH_TOKEN, refreshToken)
+                .httpOnly(true)
+                .path("/")
+                .maxAge(refreshTokenExp)
+                .sameSite(Cookie.SameSite.NONE.name())
+                .secure(true)
+                .build();
+
+        response.setHeader(HttpHeaders.SET_COOKIE, cookie.toString());
 
         return accessToken;
     }
