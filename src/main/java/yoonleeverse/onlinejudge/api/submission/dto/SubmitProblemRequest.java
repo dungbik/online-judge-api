@@ -24,4 +24,7 @@ public class SubmitProblemRequest {
             "    return 0; \n" +
             "}")
     private String code;
+
+    @Schema(example = "true", description = "채점 여부")
+    private boolean isJudge;
 }

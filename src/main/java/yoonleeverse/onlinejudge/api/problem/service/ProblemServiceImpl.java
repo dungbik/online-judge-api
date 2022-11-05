@@ -15,9 +15,11 @@ import yoonleeverse.onlinejudge.api.problem.repository.ProblemRepository;
 import yoonleeverse.onlinejudge.api.problem.repository.TagRepository;
 import yoonleeverse.onlinejudge.api.problem.repository.TestCaseRedisRepository;
 import yoonleeverse.onlinejudge.security.UserPrincipal;
+import yoonleeverse.onlinejudge.util.StringUtil;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 @Service
@@ -101,6 +103,12 @@ public class ProblemServiceImpl implements ProblemService {
 
         problem = this.problemMapper.toEntity(req);
         problem.setId(problemId);
+
+        AtomicInteger index = new AtomicInteger();
+        List<TestCase> exampleList = req.getTestCaseExamples().stream()
+                .map((e) -> new TestCase(index.getAndIncrement(), e.getInput(), e.getOutput(), StringUtil.encryptMD5(e.getOutput())))
+                .collect(Collectors.toList());
+        problem.setTestCaseExamples(exampleList);
 
         List<TestCase> testCases = this.storageService.loadTestCase(file, "problem/" + problemId);
         problem.setTestCases(testCases);

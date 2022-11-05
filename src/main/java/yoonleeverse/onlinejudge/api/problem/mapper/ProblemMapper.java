@@ -22,6 +22,7 @@ public interface ProblemMapper {
     PagingResponse toPageDto(Page source);
 
     @Mapping(target = "id", ignore = true)
+    @Mapping(target = "testCaseExamples", ignore = true)
     @Mapping(target = "testCases", ignore = true)
     @Mapping(target = "tags", ignore = true)
     @Mapping(target = "submissionHistory", expression = "java(new SubmissionHistory())")

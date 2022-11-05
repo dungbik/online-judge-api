@@ -8,6 +8,8 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import yoonleeverse.onlinejudge.api.common.entity.BaseTimeEntity;
 import yoonleeverse.onlinejudge.api.problem.entity.ProgrammingLanguage;
 
+import java.util.List;
+
 @Getter
 @Document(collection = "submissions")
 @Builder
@@ -22,10 +24,18 @@ public class Submission extends BaseTimeEntity {
     private Integer realTime; // ms
     private Integer codeLength;
 
-    public void setStatus(JudgeStatus status, Long memory, Integer realTime) {
+    private List<JudgeResult> resultList;
+    private boolean isJudge;
+
+    public void setStatus(JudgeStatus status) {
+        setStatus(status, null, null, null);
+    }
+
+    public void setStatus(JudgeStatus status, Long memory, Integer realTime, List<JudgeResult> resultList) {
         this.status = status;
         this.memory = memory;
         this.realTime = realTime;
+        this.resultList = resultList;
     }
 
     public void setUserId(String userId) {

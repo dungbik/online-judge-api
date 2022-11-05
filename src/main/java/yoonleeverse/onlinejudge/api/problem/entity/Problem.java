@@ -26,7 +26,7 @@ public class Problem extends BaseTimeEntity {
     private String desc;
     private String inputDesc;
     private String outputDesc;
-    private List<TestCaseExample> testCaseExamples;
+    private List<TestCase> testCaseExamples;
     private List<ProgrammingLanguage> languages;
     private List<TestCase> testCases;
     @DBRef private List<Tag> tags;
@@ -34,6 +34,10 @@ public class Problem extends BaseTimeEntity {
     private SubmissionHistory submissionHistory;
 
     private String userId;
+
+    public void setTestCaseExamples(List<TestCase> testCaseExamples) {
+        this.testCaseExamples = testCaseExamples;
+    }
 
     public void setTestCases(List<TestCase> testCases) {
         this.testCases = testCases;
