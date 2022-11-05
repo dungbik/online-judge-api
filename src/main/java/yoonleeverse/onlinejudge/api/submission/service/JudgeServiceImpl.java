@@ -12,8 +12,10 @@ import yoonleeverse.onlinejudge.api.submission.dto.CompleteMessage;
 import yoonleeverse.onlinejudge.api.submission.dto.JudgeMessage;
 import yoonleeverse.onlinejudge.api.submission.dto.RunResult;
 import yoonleeverse.onlinejudge.api.submission.dto.TestCaseInput;
+import yoonleeverse.onlinejudge.api.submission.entity.JudgeResult;
 import yoonleeverse.onlinejudge.api.submission.entity.JudgeStatus;
 import yoonleeverse.onlinejudge.api.submission.entity.Submission;
+import yoonleeverse.onlinejudge.api.submission.mapper.SubmissionMapper;
 import yoonleeverse.onlinejudge.api.submission.repository.SubmissionRepository;
 
 import java.util.*;
@@ -31,6 +33,7 @@ public class JudgeServiceImpl implements JudgeService {
     private final TestCaseRedisRepository testCaseRedisRepository;
     private final ProblemRepository problemRepository;
     private final SubmissionRepository submissionRepository;
+    private final SubmissionMapper submissionMapper;
 
     @Override
     public void judge(Submission submission) {
@@ -47,7 +50,12 @@ public class JudgeServiceImpl implements JudgeService {
         judgeMessage.setCode(submission.getCode());
         judgeMessage.setLanguage(submission.getLanguage());
 
-        List<TestCase> testCases = this.testCaseRedisRepository.find(problemId);
+        List<TestCase> testCases = null;
+        if (submission.isJudge()) {
+            testCases = this.testCaseRedisRepository.find(problemId);
+        } else {
+            testCases = problem.getTestCaseExamples();
+        }
         if (testCases != null) {
             List<TestCaseInput> list = testCases.stream()
                     .map(e -> new TestCaseInput(e.getId(), e.getInput()))
@@ -70,39 +78,59 @@ public class JudgeServiceImpl implements JudgeService {
             submission = this.submissionRepository.findById(completeMessage.getSubmissionId())
                     .orElseThrow(() -> new RuntimeException("존재하지 않는 제출내역입니다."));
 
-            List<TestCase> testCases = this.testCaseRedisRepository.find(completeMessage.getProblemId());
+            List<TestCase> testCases = null;
+
+            if (submission.isJudge()) {
+                testCases = this.testCaseRedisRepository.find(completeMessage.getProblemId());
+            } else {
+                Problem problem = this.problemRepository.findById(completeMessage.getProblemId())
+                        .orElseThrow(() -> new RuntimeException("존재하지 않는 문제입니다."));
+                testCases = problem.getTestCaseExamples();
+            }
+
             if (testCases != null) {
-                for (RunResult runResult : completeMessage.getResults()) {
+                List<RunResult> results = completeMessage.getResults();
+                for (RunResult runResult : results) {
                     if (runResult.getResult() != JudgeStatus.SUCCESS.getValue()) {
-                        submission.setStatus(JudgeStatus.valueOf(runResult.getResult()), null, null);
+                        submission.setStatus(JudgeStatus.valueOf(runResult.getResult()));
                         break;
                     }
                 }
 
                 if (submission.getStatus() == JudgeStatus.PENDING) {
+                    List<JudgeResult> resultList = this.submissionMapper.toResultList(results);
+
                     Map<Integer, String> testCaseMap = testCases.stream()
                             .collect(Collectors.toMap(e -> e.getId(), e -> e.getOutputMD5()));
-                    ok = (completeMessage.getResults().size() - 1) == testCases.size() &&
-                            completeMessage.getResults().stream()
-                                    .filter(runResult -> runResult.getId() > 0)
-                                    .allMatch(runResult -> testCaseMap.get(runResult.getId()).equalsIgnoreCase(runResult.getOutputMD5()));
-
-                    if (ok) {
-                        long maxMemory = 0;
-                        int maxRealTime = 0;
-                        for (RunResult runResult : completeMessage.getResults()) {
-                            maxMemory = Math.max(maxMemory, runResult.getMemory());
-                            maxRealTime =  Math.max(maxRealTime, runResult.getReal_time());
+                    if ((resultList.size() - 1) == testCases.size()) {
+                        ok = true;
+                        for (JudgeResult result : resultList) {
+                            if (result.getId() == 0
+                                    || testCaseMap.get(result.getId()).equalsIgnoreCase(result.getOutputMD5())) {
+                                result.setCorrect(true);
+                            } else {
+                                ok = false;
+                            }
                         }
-                        submission.setStatus(JudgeStatus.SUCCESS, maxMemory, maxRealTime);
+                    }
+
+                    long maxMemory = 0;
+                    int maxRealTime = 0;
+                    for (RunResult runResult : results) {
+                        maxMemory = Math.max(maxMemory, runResult.getMemory());
+                        maxRealTime = Math.max(maxRealTime, runResult.getReal_time());
+                    }
+                    if (ok) {
+                        submission.setStatus(JudgeStatus.SUCCESS, maxMemory, maxRealTime, resultList);
                         this.problemRepository.addSuccessCount(submission.getProblemId());
                     } else {
-                        submission.setStatus(JudgeStatus.WRONG_ANSWER, null, null);
+                        submission.setStatus(JudgeStatus.WRONG_ANSWER, maxMemory, maxRealTime, resultList);
                     }
                 }
             }
+
         } catch (Exception e) {
-            submission.setStatus(JudgeStatus.UNK_ERROR, null, null);
+            submission.setStatus(JudgeStatus.UNK_ERROR);
             log.debug("{}", e.getMessage());
         } finally {
             if (submission != null) {
