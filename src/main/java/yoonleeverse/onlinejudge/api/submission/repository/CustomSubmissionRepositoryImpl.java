@@ -28,9 +28,15 @@ public class CustomSubmissionRepositoryImpl implements CustomSubmissionRepositor
         Long problemId = req.getProblemId();
         ProgrammingLanguage language = req.getLanguage();
         String userId = req.getUserId();
+        boolean isRanking = req.isRanking();
         int page = NumberUtil.toPage(req.getPage());
 
-        Pageable pageable = PageRequest.of(page, SUBMISSION_MAX_SIZE, Sort.by(Sort.Direction.DESC, "id"));
+        Sort sort = Sort.by(Sort.Direction.DESC, "id");
+        if (isRanking && problemId != null) {
+            sort = Sort.by(Sort.Direction.ASC, "memory", "realTime", "codeLength");
+        }
+
+        Pageable pageable = PageRequest.of(page, SUBMISSION_MAX_SIZE, sort);
         Criteria criteria = Criteria.where("isJudge").is(true);
 
         if (problemId != null) {
