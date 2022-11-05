@@ -31,7 +31,7 @@ public class CustomSubmissionRepositoryImpl implements CustomSubmissionRepositor
         int page = NumberUtil.toPage(req.getPage());
 
         Pageable pageable = PageRequest.of(page, SUBMISSION_MAX_SIZE, Sort.by(Sort.Direction.DESC, "id"));
-        Criteria criteria = new Criteria();
+        Criteria criteria = Criteria.where("isJudge").is(true);
 
         if (problemId != null) {
             criteria.and("problemId").is(problemId);
