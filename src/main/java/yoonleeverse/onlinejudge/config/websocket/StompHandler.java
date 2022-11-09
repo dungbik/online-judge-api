@@ -11,11 +11,12 @@ import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.stereotype.Component;
+import yoonleeverse.onlinejudge.api.user.UserComponent;
+import yoonleeverse.onlinejudge.api.user.UserRedisComponent;
 import yoonleeverse.onlinejudge.config.AppConfig;
 import yoonleeverse.onlinejudge.security.AuthTokenProvider;
 import yoonleeverse.onlinejudge.util.HeaderUtil;
 
-import java.security.Principal;
 import java.util.concurrent.TimeUnit;
 
 
@@ -23,10 +24,9 @@ import java.util.concurrent.TimeUnit;
 @Component
 @Slf4j
 public class StompHandler implements ChannelInterceptor {
-
-    private final RedisTemplate redisTemplate;
     private final AuthTokenProvider authTokenProvider;
     private final AppConfig appConfig;
+    private final UserRedisComponent userRedisComponent;
 
     @Override
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
@@ -50,7 +50,7 @@ public class StompHandler implements ChannelInterceptor {
                         String id = claims.getSubject();
                         UserPrincipal userPrincipal = new UserPrincipal(id);
                         accessor.setUser(userPrincipal);
-                        this.redisTemplate.opsForValue().set("WS_USER:" + userPrincipal.getUserKey(), serverName, 1, TimeUnit.DAYS);
+                        this.userRedisComponent.addUser(serverName, userPrincipal);
                     }
                 }
                 log.debug("[STOMP] CONNECT - sessionId={} accessToken={} user={}", sessionId, accessToken, accessor.getUser());
@@ -58,7 +58,7 @@ public class StompHandler implements ChannelInterceptor {
             case DISCONNECT:
                 UserPrincipal userPrincipal = (UserPrincipal) accessor.getUser();
                 if (userPrincipal != null) {
-                    this.redisTemplate.delete("WS_USER:" + userPrincipal.getUserKey());
+                    this.userRedisComponent.removeUser(userPrincipal);
                 }
                 log.debug("[STOMP] DISCONNECT - sessionId={} user={}", sessionId, accessor.getUser());
                 break;

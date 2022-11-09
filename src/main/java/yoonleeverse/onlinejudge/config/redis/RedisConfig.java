@@ -10,23 +10,22 @@ import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
+import org.springframework.data.redis.core.RedisKeyValueAdapter;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
-import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
+import org.springframework.data.redis.repository.configuration.EnableRedisRepositories;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 import yoonleeverse.onlinejudge.config.AppConfig;
-import yoonleeverse.onlinejudge.config.redis.WebSocketMessageListener;
 
-import java.time.Duration;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @Data
 @Configuration
 @ConfigurationProperties("spring.redis")
 @RequiredArgsConstructor
+@EnableRedisRepositories(enableKeyspaceEvents = RedisKeyValueAdapter.EnableKeyspaceEvents.ON_STARTUP)
 public class RedisConfig {
 
     private String host;
@@ -45,6 +44,16 @@ public class RedisConfig {
     }
 
     @Bean
+    public RedisMessageListenerContainer redisMessageListenerContainer() {
+        String serverName = this.appConfig.getServerName();
+
+        RedisMessageListenerContainer container = new RedisMessageListenerContainer();
+        container.setConnectionFactory(redisConnectionFactory());
+        container.addMessageListener(this.webSocketMessageListener, new ChannelTopic("WS_USER:" + serverName));
+        return container;
+    }
+
+    @Bean
     public RedisCacheManager redisCacheManager() {
         Map<String, RedisCacheConfiguration> cacheConfigurations = new HashMap<>();
 
@@ -60,21 +69,11 @@ public class RedisConfig {
     }
 
     @Bean
-    public RedisTemplate<String, String> redisTemplate() {
+    public RedisTemplate<?, ?> redisTemplate(RedisConnectionFactory redisConnectionFactory) {
         RedisTemplate<String, String> redisTemplate = new RedisTemplate<>();
-        redisTemplate.setConnectionFactory(redisConnectionFactory());
+        redisTemplate.setConnectionFactory(redisConnectionFactory);
         redisTemplate.setKeySerializer(new StringRedisSerializer());
         redisTemplate.setValueSerializer(new StringRedisSerializer());
         return redisTemplate;
-    }
-
-    @Bean
-    public RedisMessageListenerContainer redisMessageListenerContainer(RedisConnectionFactory connectionFactory) {
-        String serverName = this.appConfig.getServerName();
-
-        RedisMessageListenerContainer container = new RedisMessageListenerContainer();
-        container.setConnectionFactory(connectionFactory);
-        container.addMessageListener(this.webSocketMessageListener, new ChannelTopic("WS_USER:" + serverName));
-        return container;
     }
 }
