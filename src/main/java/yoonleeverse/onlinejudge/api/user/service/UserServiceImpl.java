@@ -111,7 +111,7 @@ public class UserServiceImpl implements UserService {
 
         String accessToken = userComponent.issueToken(response, user.getId());
 
-        return SignInResponse.ofSuccess(accessToken);
+        return SignInResponse.ofSuccess(accessToken, user.getRoles());
     }
 
     @Override
