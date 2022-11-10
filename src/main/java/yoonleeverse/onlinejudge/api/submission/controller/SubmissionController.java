@@ -2,6 +2,7 @@ package yoonleeverse.onlinejudge.api.submission.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -32,7 +33,8 @@ public class SubmissionController {
 
     @Operation(summary = "채점 제출 이력 보기")
     @GetMapping
-    public GetAllSubmissionResponse getAllSubmission(@RequestParam Map<String, String> params) {
+    public GetAllSubmissionResponse getAllSubmission(@RequestParam @Parameter(hidden = true) Map<String, String> params,
+                                                     GetAllSubmissionRequest dummy) {
         GetAllSubmissionRequest req = this.objectMapper.convertValue(params, GetAllSubmissionRequest.class);
         return this.submissionService.getAllSubmission(req);
     }
