@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 
 @Data
 public class Submission {
+    private String id;
     private String userId;
     private long problemId;
     private ProgrammingLanguage language;
