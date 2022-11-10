@@ -34,9 +34,4 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     public void configureClientInboundChannel(ChannelRegistration registration) {
         registration.interceptors(stompHandler);
     }
-
-    @Bean
-    public GenericJackson2JsonRedisSerializer genericJackson2JsonRedisSerializer() {
-        return new GenericJackson2JsonRedisSerializer();
-    }
 }

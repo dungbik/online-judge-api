@@ -16,6 +16,7 @@ import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
 import org.springframework.data.redis.repository.configuration.EnableRedisRepositories;
+import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 import yoonleeverse.onlinejudge.config.AppConfig;
 
@@ -66,11 +67,23 @@ public class RedisConfig {
     }
 
     @Bean
-    public RedisTemplate redisTemplate(RedisConnectionFactory redisConnectionFactory) {
+    public GenericJackson2JsonRedisSerializer genericJackson2JsonRedisSerializer() {
+        return new GenericJackson2JsonRedisSerializer();
+    }
+
+    @Bean
+    public RedisTemplate redisTemplate(RedisConnectionFactory redisConnectionFactory, GenericJackson2JsonRedisSerializer jackson2JsonRedisSerializer) {
         RedisTemplate redisTemplate = new RedisTemplate<>();
         redisTemplate.setConnectionFactory(redisConnectionFactory);
-//        redisTemplate.setKeySerializer(new StringRedisSerializer());
-//        redisTemplate.setValueSerializer(new StringRedisSerializer());
+
+        redisTemplate.setDefaultSerializer(jackson2JsonRedisSerializer);
+
+        redisTemplate.setKeySerializer(new StringRedisSerializer());
+        redisTemplate.setValueSerializer(jackson2JsonRedisSerializer);
+
+        redisTemplate.setHashKeySerializer(new StringRedisSerializer());
+        redisTemplate.setHashValueSerializer(jackson2JsonRedisSerializer);
+
         return redisTemplate;
     }
 }
