@@ -24,13 +24,13 @@ import static yoonleeverse.onlinejudge.api.common.constant.Constants.Cookie.REFR
 @RequiredArgsConstructor
 public class UserRedisComponent {
 
-//    private final RedisTemplate redisTemplate;
+    private final RedisTemplate redisTemplate;
 
     public void removeUser(UserPrincipal userPrincipal) {
-//        this.redisTemplate.delete("WS_USER:" + userPrincipal.getUserKey());
+        this.redisTemplate.delete("WS_USER:" + userPrincipal.getUserKey());
     }
 
     public void addUser(String serverName, UserPrincipal userPrincipal) {
-//        this.redisTemplate.opsForValue().set("WS_USER:" + userPrincipal.getUserKey(), serverName, 1, TimeUnit.DAYS);
+        this.redisTemplate.opsForValue().set("WS_USER:" + userPrincipal.getUserKey(), serverName, 1, TimeUnit.DAYS);
     }
 }

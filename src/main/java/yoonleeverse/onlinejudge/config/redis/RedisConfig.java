@@ -14,11 +14,14 @@ import org.springframework.data.redis.core.RedisKeyValueAdapter;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
+import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
 import org.springframework.data.redis.repository.configuration.EnableRedisRepositories;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 import yoonleeverse.onlinejudge.config.AppConfig;
 
+import java.time.Duration;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Data
@@ -33,7 +36,6 @@ public class RedisConfig {
     private String password;
 
     private final AppConfig appConfig;
-    private final WebSocketMessageListener webSocketMessageListener;
 
     @Bean
     public RedisConnectionFactory redisConnectionFactory() {
@@ -44,32 +46,27 @@ public class RedisConfig {
     }
 
     @Bean
-    public RedisMessageListenerContainer redisMessageListenerContainer() {
+    public MessageListenerAdapter listenerAdapter(WebSocketMessageListener webSocketMessageListener) {
+        return new MessageListenerAdapter(webSocketMessageListener, "onMessage");
+    }
+
+    @Bean
+    public ChannelTopic channelTopic() {
         String serverName = this.appConfig.getServerName();
 
+        return  new ChannelTopic("WS_USER:" + serverName);
+    }
+
+    @Bean
+    public RedisMessageListenerContainer redisMessageListenerContainer(RedisConnectionFactory connectionFactory, MessageListenerAdapter listenerAdapter, ChannelTopic channelTopic) {
         RedisMessageListenerContainer container = new RedisMessageListenerContainer();
-        container.setConnectionFactory(redisConnectionFactory());
-        container.addMessageListener(this.webSocketMessageListener, new ChannelTopic("WS_USER:" + serverName));
+        container.setConnectionFactory(connectionFactory);
+        container.addMessageListener(listenerAdapter, channelTopic);
         return container;
     }
 
     @Bean
-    public RedisCacheManager redisCacheManager() {
-        Map<String, RedisCacheConfiguration> cacheConfigurations = new HashMap<>();
-
-        return RedisCacheManager.RedisCacheManagerBuilder
-                .fromConnectionFactory(redisConnectionFactory())
-                .cacheDefaults(defaultConfiguration())
-                .withInitialCacheConfigurations(cacheConfigurations)
-                .build();
-    }
-
-    private RedisCacheConfiguration defaultConfiguration() {
-        return RedisCacheConfiguration.defaultCacheConfig();
-    }
-
-    @Bean
-    public RedisTemplate<?, ?> redisTemplate(RedisConnectionFactory redisConnectionFactory) {
+    public RedisTemplate<String, String> redisTemplate(RedisConnectionFactory redisConnectionFactory) {
         RedisTemplate<String, String> redisTemplate = new RedisTemplate<>();
         redisTemplate.setConnectionFactory(redisConnectionFactory);
         redisTemplate.setKeySerializer(new StringRedisSerializer());
