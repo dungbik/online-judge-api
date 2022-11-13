@@ -19,4 +19,6 @@ public interface UserService {
     APIResponse signOut(HttpServletRequest request, HttpServletResponse response, UserPrincipal userPrincipal);
 
     RefreshTokenResponse refreshToken(HttpServletRequest request, HttpServletResponse response);
+
+    APIResponse addSnsAccount(String linkKey, String username);
 }

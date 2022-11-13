@@ -68,4 +68,12 @@ public class UserController {
         return userService.refreshToken(request, response);
     }
 
+    @Operation(summary = "SNS 계정 연동", security = { @SecurityRequirement(name = "Bearer") })
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/link/{linkKey}")
+    public APIResponse addSnsAccount(@PathVariable String linkKey, @CurrentUser UserPrincipal userPrincipal) {
+
+        return userService.addSnsAccount(linkKey, userPrincipal.getUsername());
+    }
+
 }

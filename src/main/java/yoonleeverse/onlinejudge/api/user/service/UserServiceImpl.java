@@ -158,4 +158,22 @@ public class UserServiceImpl implements UserService {
         return RefreshTokenResponse.ofSuccess(accessToken);
     }
 
+    @Override
+    public APIResponse addSnsAccount(String linkKey, String username) {
+
+        UserEntity user = userRepository.findById(username)
+                .orElseThrow(() -> new BadCredentialsException("존재하지 않는 회원입니다."));
+
+        if (StringUtils.isNotEmpty(linkKey)) {
+            OAuthLink oAuthLink = oAuthLinkRedisRepository.findById(linkKey)
+                    .orElseThrow(() -> new RuntimeException("OAuth 인증 정보가 존재하지 않습니다."));
+
+            user.addOAuthLink(oAuthLink);
+            oAuthLinkRedisRepository.delete(oAuthLink);
+        }
+
+        userRepository.save(user);
+        return new APIResponse();
+    }
+
 }
