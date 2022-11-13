@@ -58,7 +58,7 @@ public class UserServiceImpl implements UserService {
                 .id(id)
                 .name(name)
                 .password(passwordEncoder.encode(password))
-                .roles(Set.of(ROLE_USER.name()))
+                .roles(Set.of(ROLE_USER))
                 .links(new ArrayList<>())
                 .build();
 
