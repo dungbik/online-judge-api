@@ -4,6 +4,7 @@ import lombok.Builder;
 import lombok.Getter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+import yoonleeverse.onlinejudge.api.common.constant.Constants;
 import yoonleeverse.onlinejudge.api.common.entity.BaseTimeEntity;
 
 import java.util.List;
@@ -18,7 +19,7 @@ public class UserEntity extends BaseTimeEntity {
     private String password;
     private String avatarUrl;
     private List<OAuthLink> links;
-    private Set<String> roles;
+    private Set<Constants.ERole> roles;
 
     public void addOAuthLink(OAuthLink oAuthLink) {
         this.avatarUrl = oAuthLink.getAvatarUrl();

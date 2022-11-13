@@ -1,9 +1,12 @@
 package yoonleeverse.onlinejudge.api.submission.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
+import yoonleeverse.onlinejudge.api.common.constant.Constants;
 import yoonleeverse.onlinejudge.api.problem.entity.Problem;
 import yoonleeverse.onlinejudge.api.problem.entity.TestCase;
 import yoonleeverse.onlinejudge.api.problem.repository.ProblemRepository;
@@ -17,6 +20,11 @@ import yoonleeverse.onlinejudge.api.submission.entity.JudgeStatus;
 import yoonleeverse.onlinejudge.api.submission.entity.Submission;
 import yoonleeverse.onlinejudge.api.submission.mapper.SubmissionMapper;
 import yoonleeverse.onlinejudge.api.submission.repository.SubmissionRepository;
+import yoonleeverse.onlinejudge.config.redis.RedisPublisher;
+import yoonleeverse.onlinejudge.config.websocket.WebSocketMessage;
+import yoonleeverse.onlinejudge.config.websocket.WebSocketMessage.Notification;
+import yoonleeverse.onlinejudge.util.JsonUtil;
+import yoonleeverse.onlinejudge.util.StringUtil;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -34,6 +42,8 @@ public class JudgeServiceImpl implements JudgeService {
     private final ProblemRepository problemRepository;
     private final SubmissionRepository submissionRepository;
     private final SubmissionMapper submissionMapper;
+    private final RedisPublisher redisPublisher;
+    private final ObjectMapper objectMapper;
 
     @Override
     public void judge(Submission submission) {
@@ -73,8 +83,11 @@ public class JudgeServiceImpl implements JudgeService {
     public void completeJudge(CompleteMessage completeMessage) {
         boolean ok = false;
         Submission submission = null;
+        Problem problem = null;
 
         try {
+            problem = this.problemRepository.findById(completeMessage.getProblemId())
+                    .orElseThrow(() -> new RuntimeException("존재하지 않는 문제입니다."));
             submission = this.submissionRepository.findById(completeMessage.getSubmissionId())
                     .orElseThrow(() -> new RuntimeException("존재하지 않는 제출내역입니다."));
 
@@ -83,8 +96,6 @@ public class JudgeServiceImpl implements JudgeService {
             if (submission.isJudge()) {
                 testCases = this.testCaseRedisRepository.find(completeMessage.getProblemId());
             } else {
-                Problem problem = this.problemRepository.findById(completeMessage.getProblemId())
-                        .orElseThrow(() -> new RuntimeException("존재하지 않는 문제입니다."));
                 testCases = problem.getTestCaseExamples();
             }
 
@@ -137,6 +148,23 @@ public class JudgeServiceImpl implements JudgeService {
                 this.submissionRepository.save(submission);
             }
             log.debug("completeJudge {} {}", ok, completeMessage);
+
+            String to = StringUtil.encryptMD5(submission.getUserId());
+            if (submission.isJudge()) {
+                Notification notification = new Notification();
+                notification.setVariant(WebSocketMessage.Variant.SUCCESS);
+                notification.setMessage("제출한 문제가 채점이 완료되었습니다.");
+
+                redisPublisher.publishMessage(new WebSocketMessage(Constants.WebSocketMessageType.JUDGE_RESULT, JsonUtil.makeJson(notification), to));
+            } else {
+                String content = "";
+                try {
+                    content = this.objectMapper.writeValueAsString(submission);
+                } catch (JsonProcessingException e) {
+                    e.printStackTrace();
+                }
+                redisPublisher.publishMessage(new WebSocketMessage(Constants.WebSocketMessageType.RUN_RESULT, content, to));
+            }
         }
     }
 }

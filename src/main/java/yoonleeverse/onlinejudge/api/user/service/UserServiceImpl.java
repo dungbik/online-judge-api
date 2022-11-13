@@ -58,7 +58,7 @@ public class UserServiceImpl implements UserService {
                 .id(id)
                 .name(name)
                 .password(passwordEncoder.encode(password))
-                .roles(Set.of(ROLE_USER.name()))
+                .roles(Set.of(ROLE_USER))
                 .links(new ArrayList<>())
                 .build();
 
@@ -111,7 +111,7 @@ public class UserServiceImpl implements UserService {
 
         String accessToken = userComponent.issueToken(response, user.getId());
 
-        return SignInResponse.ofSuccess(accessToken);
+        return SignInResponse.ofSuccess(accessToken, user.getRoles());
     }
 
     @Override

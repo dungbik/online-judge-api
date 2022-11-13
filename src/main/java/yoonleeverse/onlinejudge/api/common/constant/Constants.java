@@ -17,4 +17,9 @@ public class Constants {
     public enum FileExtension {
         ZIP, PNG, JPG, JPEG
     }
+
+    public enum WebSocketMessageType {
+        JUDGE_RESULT,
+        RUN_RESULT
+    }
 }

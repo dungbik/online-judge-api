@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 
 @Data
 public class Submission {
+    private String id;
     private String userId;
     private long problemId;
     private ProgrammingLanguage language;
@@ -16,5 +17,6 @@ public class Submission {
     private Integer realTime; // ms
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private String code;
     private Integer codeLength;
 }

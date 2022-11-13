@@ -1,5 +1,7 @@
 package yoonleeverse.onlinejudge.util;
 
+import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
+
 import javax.servlet.http.HttpServletRequest;
 
 public class HeaderUtil {
@@ -10,6 +12,16 @@ public class HeaderUtil {
     public static String getAccessToken(HttpServletRequest request) {
         String headerValue = request.getHeader(HEADER_AUTHORIZATION);
 
+        return getAccessToken(headerValue);
+    }
+
+    public static String getAccessToken(StompHeaderAccessor accessor) {
+        String headerValue = accessor.getFirstNativeHeader(HEADER_AUTHORIZATION);
+
+        return getAccessToken(headerValue);
+    }
+
+    private static String getAccessToken(String headerValue) {
         if (headerValue == null) {
             return null;
         }

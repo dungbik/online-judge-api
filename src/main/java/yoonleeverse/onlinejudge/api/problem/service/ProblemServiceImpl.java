@@ -96,9 +96,10 @@ public class ProblemServiceImpl implements ProblemService {
      * @param userId 문제를 추가한 유저의 아이디
      */
     private void addProblem(Problem problem, AddProblemRequest req, MultipartFile file, String userId) {
-        this.checkIfExistingTitle(req);
-
         boolean isNew = problem == null;
+        if (isNew || !problem.getTitle().equals(req.getTitle()))
+            this.checkIfExistingTitle(req);
+
         long problemId = isNew ? this.counterRepository.getNextSequence(MongoDB.PROBLEM) : problem.getId();
 
         problem = this.problemMapper.toEntity(req);
