@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import yoonleeverse.onlinejudge.api.submission.dto.GetAllSubmissionRequest;
 import yoonleeverse.onlinejudge.api.submission.dto.GetAllSubmissionResponse;
@@ -26,6 +27,7 @@ public class SubmissionController {
 
     @Operation(summary = "문제 채점", security = { @SecurityRequirement(name = "Bearer") })
     @PostMapping
+    @PreAuthorize("hasRole('USER')")
     public SubmitProblemResponse submitProblem(@CurrentUser UserPrincipal userPrincipal,
                                                @RequestBody SubmitProblemRequest req) {
          return submissionService.submitProblem(userPrincipal, req);
