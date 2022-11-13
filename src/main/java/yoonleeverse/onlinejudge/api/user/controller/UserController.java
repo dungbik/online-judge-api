@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import yoonleeverse.onlinejudge.api.common.dto.APIResponse;
 import yoonleeverse.onlinejudge.api.user.dto.*;
@@ -24,6 +25,7 @@ public class UserController {
     private final UserService userService;
 
     @Operation(summary = "현재 로그인된 유저 정보", security = { @SecurityRequirement(name = "Bearer") })
+    @PreAuthorize("isAuthenticated()")
     @GetMapping
     public CurrentUserResponse getCurrentUser(@CurrentUser UserPrincipal userPrincipal) {
 
