@@ -78,7 +78,7 @@ public class UserController {
 
     @Operation(summary = "비밀번호 변경", security = { @SecurityRequirement(name = "Bearer") })
     @PreAuthorize("isAuthenticated()")
-    @PostMapping("/updatePassword")
+    @PatchMapping("/updatePassword")
     public APIResponse updatePassword(@CurrentUser UserPrincipal userPrincipal,
                                       @RequestParam String oldPassword, @RequestParam String password) {
 
