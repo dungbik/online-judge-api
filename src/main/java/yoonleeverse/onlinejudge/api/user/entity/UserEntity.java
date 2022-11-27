@@ -25,4 +25,8 @@ public class UserEntity extends BaseTimeEntity {
         this.avatarUrl = oAuthLink.getAvatarUrl();
         this.links.add(oAuthLink);
     }
+
+    public void changePassword(String password) {
+        this.password = password;
+    }
 }

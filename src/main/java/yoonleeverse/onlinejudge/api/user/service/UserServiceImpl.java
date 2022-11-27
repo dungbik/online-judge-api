@@ -176,4 +176,20 @@ public class UserServiceImpl implements UserService {
         return new APIResponse();
     }
 
+    @Override
+    public APIResponse updatePassword(String username, String oldPassword, String password) {
+
+        UserEntity user = userRepository.findById(username)
+                .orElseThrow(() -> new BadCredentialsException("존재하지 않는 회원입니다."));
+
+        if (!passwordEncoder.matches(oldPassword, user.getPassword())) {
+            throw new BadCredentialsException("비밀번호가 틀렸습니다.");
+        }
+
+        user.changePassword(passwordEncoder.encode(password));
+        userRepository.save(user);
+
+        return new APIResponse();
+    }
+
 }

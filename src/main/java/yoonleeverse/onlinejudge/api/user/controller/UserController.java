@@ -76,4 +76,13 @@ public class UserController {
         return userService.addSnsAccount(linkKey, userPrincipal.getUsername());
     }
 
+    @Operation(summary = "비밀번호 변경", security = { @SecurityRequirement(name = "Bearer") })
+    @PreAuthorize("isAuthenticated()")
+    @PostMapping("/updatePassword")
+    public APIResponse updatePassword(@CurrentUser UserPrincipal userPrincipal,
+                                      @RequestParam String oldPassword, @RequestParam String password) {
+
+        return userService.updatePassword(userPrincipal.getUsername(), oldPassword, password);
+    }
+
 }
