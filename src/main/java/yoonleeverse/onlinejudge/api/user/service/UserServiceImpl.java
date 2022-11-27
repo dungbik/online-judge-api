@@ -110,6 +110,10 @@ public class UserServiceImpl implements UserService {
             }
         }
 
+        if (!user.isEnabled()) {
+            throw new BadCredentialsException("탈퇴한 회원입니다.");
+        }
+
         String accessToken = userComponent.issueToken(response, user.getId());
 
         return SignInResponse.ofSuccess(accessToken, user);
