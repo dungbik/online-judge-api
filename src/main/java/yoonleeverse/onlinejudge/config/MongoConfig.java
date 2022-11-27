@@ -1,8 +1,8 @@
 package yoonleeverse.onlinejudge.config;
 
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.mongodb.MongoDatabaseFactory;
 import org.springframework.data.mongodb.core.convert.*;
 import org.springframework.data.mongodb.core.mapping.MongoMappingContext;
 
@@ -10,10 +10,9 @@ import org.springframework.data.mongodb.core.mapping.MongoMappingContext;
 public class MongoConfig {
 
     @Bean
-    @ConditionalOnMissingBean(MongoConverter.class)
-    public MappingMongoConverter mappingMongoConverter(MongoMappingContext context, MongoCustomConversions conversions) {
-        MappingMongoConverter converter = new MappingMongoConverter(NoOpDbRefResolver.INSTANCE, context);
-        converter.setCustomConversions(conversions);
+    public MappingMongoConverter mappingMongoConverter(MongoDatabaseFactory factory, MongoMappingContext context) {
+        DbRefResolver dbRefResolver = new DefaultDbRefResolver(factory);
+        MappingMongoConverter converter = new MappingMongoConverter(dbRefResolver, context);
         converter.setTypeMapper(new DefaultMongoTypeMapper(null));
         return converter;
     }
