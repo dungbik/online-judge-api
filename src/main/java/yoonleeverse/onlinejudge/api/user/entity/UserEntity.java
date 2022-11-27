@@ -20,6 +20,7 @@ public class UserEntity extends BaseTimeEntity {
     private String avatarUrl;
     private List<OAuthLink> links;
     private Set<Constants.ERole> roles;
+    private boolean enabled;
 
     public void addOAuthLink(OAuthLink oAuthLink) {
         this.avatarUrl = oAuthLink.getAvatarUrl();
@@ -28,5 +29,9 @@ public class UserEntity extends BaseTimeEntity {
 
     public void changePassword(String password) {
         this.password = password;
+    }
+
+    public void deleteUser() {
+        this.enabled = false;
     }
 }

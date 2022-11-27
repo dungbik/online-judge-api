@@ -60,6 +60,7 @@ public class UserServiceImpl implements UserService {
                 .password(passwordEncoder.encode(password))
                 .roles(Set.of(ROLE_USER))
                 .links(new ArrayList<>())
+                .enabled(true)
                 .build();
 
         if (StringUtils.isNotEmpty(linkKey)) {
@@ -187,6 +188,18 @@ public class UserServiceImpl implements UserService {
         }
 
         user.changePassword(passwordEncoder.encode(password));
+        userRepository.save(user);
+
+        return new APIResponse();
+    }
+
+    @Override
+    public APIResponse deleteUser(String username) {
+
+        UserEntity user = userRepository.findById(username)
+                .orElseThrow(() -> new BadCredentialsException("존재하지 않는 회원입니다."));
+
+        user.deleteUser();
         userRepository.save(user);
 
         return new APIResponse();

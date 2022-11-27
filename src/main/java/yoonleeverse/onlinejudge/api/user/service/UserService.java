@@ -23,4 +23,6 @@ public interface UserService {
     APIResponse addSnsAccount(String linkKey, String username);
 
     APIResponse updatePassword(String username, String oldPassword, String password);
+
+    APIResponse deleteUser(String username);
 }

@@ -85,4 +85,11 @@ public class UserController {
         return userService.updatePassword(userPrincipal.getUsername(), oldPassword, password);
     }
 
+    @Operation(summary = "회원 탈퇴", security = { @SecurityRequirement(name = "Bearer") })
+    @PreAuthorize("isAuthenticated() and not hasRole('ADMIN')")
+    @DeleteMapping
+    public APIResponse deleteUser(@CurrentUser UserPrincipal userPrincipal) {
+        return userService.deleteUser(userPrincipal.getUsername());
+    }
+
 }

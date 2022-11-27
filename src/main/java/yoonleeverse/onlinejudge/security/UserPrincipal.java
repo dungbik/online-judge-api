@@ -27,6 +27,7 @@ public class UserPrincipal implements UserDetails {
     private final String password;
     private final Collection<GrantedAuthority> authorities;
     private Map<String, Object> attributes;
+    private final boolean enabled;
 
     @Override
     public String getUsername() {
@@ -48,11 +49,6 @@ public class UserPrincipal implements UserDetails {
         return true;
     }
 
-    @Override
-    public boolean isEnabled() {
-        return true;
-    }
-
     public static UserPrincipal create(UserEntity userEntity) {
         return new UserPrincipal(
                 userEntity.getName(),
@@ -60,7 +56,8 @@ public class UserPrincipal implements UserDetails {
                 userEntity.getPassword(),
                 userEntity.getRoles().stream()
                         .map((role) -> new SimpleGrantedAuthority(role.name()))
-                        .collect(Collectors.toList())
+                        .collect(Collectors.toList()),
+                userEntity.isEnabled()
         );
     }
 }
