@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>웹 소켓 테스트 할꼬잉</title>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.1/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+
+    <!-- jquery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"
+            integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+            crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.qrcode/1.0/jquery.qrcode.min.js"
+            integrity="sha512-NFUcDlm4V+a2sjPX7gREIXgCSFja9cHtKPOL1zj6QhnE0vcY695MODehqkaGYTLyL2wxe/wtr4Z49SvqXq12UQ=="
+            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+</head>
+<body>
+</body>
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        connectServer();
+    });
+
+    var stompClient = null;
+
+    function connectServer() {
+
+        var url = 'https://online-judge-api.yoonleeverse.com/ws';
+
+        var socket = new SockJS(url);
+        stompClient = Stomp.over(socket);
+
+        stompClient.connect({ 'Authorization': 'Bearer ' },
+            function (frame) {
+                console.log('Connected: ' + frame);
+
+                stompClient.subscribe("/user/queue/notification", function(message) {
+
+                    const res = JSON.parse(message.body);
+                    console.log(res);
+                });
+
+                stompClient.subscribe("/user/queue/problem/run", function(message) {
+
+                    const res = JSON.parse(message.body);
+                    console.log(res);
+                });
+            },
+            function (message) {
+                alert("disconnect:" + message);
+            }
+        );
+    }
+
+</script>
+
+
+</html>
