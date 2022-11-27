@@ -10,8 +10,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
-import yoonleeverse.onlinejudge.api.user.entity.TokenStorage;
-import yoonleeverse.onlinejudge.api.user.repository.TokenStorageRedisRepository;
 import yoonleeverse.onlinejudge.util.HeaderUtil;
 
 import javax.servlet.FilterChain;
@@ -26,7 +24,6 @@ import java.io.IOException;
 public class TokenAuthenticationFilter extends OncePerRequestFilter {
     private final AuthTokenProvider tokenProvider;
     private final CustomUserDetailsService customUserDetailsService;
-    private final TokenStorageRedisRepository tokenStorageRedisRepository;
 
     @Override
     protected void doFilterInternal(
@@ -39,20 +36,10 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
             Claims claims = tokenProvider.getTokenClaims(accessToken);
             if (claims != null) {
                 String id = claims.getSubject();
-                TokenStorage tokenStorage = tokenStorageRedisRepository.findById(id)
-                        .orElse(null);
-                if (tokenStorage != null) {
-                    if (!accessToken.equals(tokenStorage.getAccessToken())) {
-                        tokenStorageRedisRepository.deleteById(id);
-                        filterChain.doFilter(request, response);
-                        return;
-                    }
-
-                    UserDetails userDetails = customUserDetailsService.loadUserByUsername(id);
-                    UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-                    authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                    SecurityContextHolder.getContext().setAuthentication(authentication);
-                }
+                UserDetails userDetails = customUserDetailsService.loadUserByUsername(id);
+                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                SecurityContextHolder.getContext().setAuthentication(authentication);
             }
         }
 

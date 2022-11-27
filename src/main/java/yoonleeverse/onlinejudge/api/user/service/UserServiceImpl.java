@@ -145,7 +145,7 @@ public class UserServiceImpl implements UserService {
         }
 
         String oldRefreshToken = cookie.getValue();
-        TokenStorage oldTokenStorage = tokenStorageRedisRepository.findByRefreshToken(oldRefreshToken)
+        TokenStorage oldTokenStorage = tokenStorageRedisRepository.findById(oldRefreshToken)
                 .orElse(null);
         if (oldTokenStorage == null) {
             return RefreshTokenResponse.ofFail();

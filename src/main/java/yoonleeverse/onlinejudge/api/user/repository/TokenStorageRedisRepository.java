@@ -7,5 +7,4 @@ import java.util.Optional;
 
 public interface TokenStorageRedisRepository extends CrudRepository<TokenStorage, String> {
 
-    Optional<TokenStorage> findByRefreshToken(String refreshToken);
 }

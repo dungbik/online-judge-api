@@ -5,7 +5,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import nonapi.io.github.classgraph.json.Id;
 import org.springframework.data.redis.core.RedisHash;
-import org.springframework.data.redis.core.index.Indexed;
 
 import java.io.Serializable;
 
@@ -14,7 +13,6 @@ import java.io.Serializable;
 @AllArgsConstructor
 @RedisHash(value = "TokenStorage", timeToLive = 14 * 24 * 60 * 60)
 public class TokenStorage implements Serializable {
-    @Id private String id;
-    private String accessToken;
-    @Indexed private String refreshToken;
+    @Id private String refreshToken;
+    private String id;
 }

@@ -58,7 +58,7 @@ public class UserComponent {
         String accessToken = authTokenProvider.createAccessToken(id);
         String refreshToken = authTokenProvider.createRefreshToken(id);
 
-        TokenStorage tokenStorage = new TokenStorage(id, accessToken, refreshToken);
+        TokenStorage tokenStorage = new TokenStorage(refreshToken, id);
         tokenStorageRedisRepository.save(tokenStorage);
 
         int refreshTokenExp = (int) appProperties.getAuth().getRefreshTokenExp();
