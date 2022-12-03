@@ -156,7 +156,7 @@ public class UserServiceImpl implements UserService {
             return RefreshTokenResponse.ofFail();
         }
 
-        String id = oldTokenStorage.getId();
+        String id = oldTokenStorage.getUserId();
         tokenStorageRedisRepository.delete(oldTokenStorage);
         String accessToken = userComponent.issueToken(response, id);
 
