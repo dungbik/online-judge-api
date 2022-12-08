@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 
+import javax.validation.constraints.Email;
 import javax.validation.constraints.Size;
 
 @Data
@@ -16,9 +17,9 @@ public class SignUpRequest {
     @Size(min = 3, max = 10)
     private String name;
 
-    @Schema(example = "test1234", description = "아이디")
+    @Schema(example = "test1234@naver.com", description = "이메일")
     @NonNull
-    @Size(min = 5, max = 20)
+    @Email
     private String id;
 
     @Schema(example = "test1234", description = "비밀번호")
