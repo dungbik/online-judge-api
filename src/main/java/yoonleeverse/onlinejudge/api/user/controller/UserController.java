@@ -92,4 +92,11 @@ public class UserController {
         return userService.deleteUser(userPrincipal.getUsername());
     }
 
+    @Operation(summary = "이메일 인증")
+    @GetMapping("/verify/{code}")
+    public APIResponse verifyEmail(@PathVariable @Schema(description = "인증 코드") String code) {
+
+        return userService.verifyEmail(code);
+    }
+
 }

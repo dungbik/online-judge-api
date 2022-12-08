@@ -8,10 +8,12 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import java.util.ArrayList;
 import java.util.List;
 
+@Getter @Setter
 @ConfigurationProperties(prefix = "app")
 public class AppProperties {
     private final Auth auth = new Auth();
     private final OAuth2 oauth2 = new OAuth2();
+    private String verifyUrl;
 
     @Getter @Setter
     public static class Auth {
@@ -28,13 +30,5 @@ public class AppProperties {
             this.authorizedRedirectUris = authorizedRedirectUris;
             return this;
         }
-    }
-
-    public Auth getAuth() {
-        return auth;
-    }
-
-    public OAuth2 getOauth2() {
-        return oauth2;
     }
 }

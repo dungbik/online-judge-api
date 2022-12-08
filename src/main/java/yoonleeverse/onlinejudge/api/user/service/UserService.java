@@ -25,4 +25,6 @@ public interface UserService {
     APIResponse updatePassword(String username, String oldPassword, String password);
 
     APIResponse deleteUser(String username);
+
+    APIResponse verifyEmail(String code);
 }

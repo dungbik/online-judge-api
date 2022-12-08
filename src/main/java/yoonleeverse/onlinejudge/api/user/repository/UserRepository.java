@@ -15,5 +15,6 @@ public interface UserRepository extends MongoRepository<UserEntity, String>, Cus
 
     boolean existsByName(String name);
 
-    Optional<UserEntity> findById(String id);
+    Optional<UserEntity> findByVerifyCode(String verifyCode);
+
 }

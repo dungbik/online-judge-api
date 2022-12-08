@@ -44,6 +44,18 @@ spring:
     port: ${RABBITMQ_PORT:5672}
     username: ${RABBITMQ_USERNAME:guest}
     password: ${RABBITMQ_PASSWORD:guest}
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${MAIL_USERNAME:test@gmail.com}
+    password: ${MAIL_PASSWORD:1234}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          timeout: 5000
+          starttls:
+            enable: true
 
 app:
   auth:
@@ -53,6 +65,7 @@ app:
   oauth2:
     authorizedRedirectUris:
       - ${OAUTH_REDIRECT_URI:http://localhost:3000/oauth2/redirect}
+  verify-url: ${VERIFY_URL:http://localhost/verify?code=%s}
 
 springdoc:
   swagger-ui:

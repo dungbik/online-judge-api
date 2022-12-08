@@ -6,6 +6,8 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import yoonleeverse.onlinejudge.api.common.dto.APIResponse;
+import yoonleeverse.onlinejudge.api.common.dto.EmailMessage;
+import yoonleeverse.onlinejudge.api.common.service.EmailService;
 import yoonleeverse.onlinejudge.api.user.UserComponent;
 import yoonleeverse.onlinejudge.api.user.dto.*;
 import yoonleeverse.onlinejudge.api.user.entity.OAuthLink;
@@ -14,6 +16,7 @@ import yoonleeverse.onlinejudge.api.user.entity.UserEntity;
 import yoonleeverse.onlinejudge.api.user.repository.OAuthLinkRedisRepository;
 import yoonleeverse.onlinejudge.api.user.repository.TokenStorageRedisRepository;
 import yoonleeverse.onlinejudge.api.user.repository.UserRepository;
+import yoonleeverse.onlinejudge.config.AppProperties;
 import yoonleeverse.onlinejudge.security.UserPrincipal;
 import yoonleeverse.onlinejudge.util.CookieUtil;
 
@@ -21,7 +24,8 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
-import java.util.Set;
+import java.util.HashSet;
+import java.util.UUID;
 
 import static yoonleeverse.onlinejudge.api.common.constant.Constants.Cookie.REFRESH_TOKEN;
 import static yoonleeverse.onlinejudge.api.common.constant.Constants.ERole.ROLE_USER;
@@ -35,6 +39,8 @@ public class UserServiceImpl implements UserService {
     private final OAuthLinkRedisRepository oAuthLinkRedisRepository;
     private final TokenStorageRedisRepository tokenStorageRedisRepository;
     private final UserComponent userComponent;
+    private final EmailService emailService;
+    private final AppProperties appProperties;
 
     @Override
     public SignUpResponse signUp(HttpServletResponse response, SignUpRequest req) {
@@ -58,7 +64,7 @@ public class UserServiceImpl implements UserService {
                 .id(id)
                 .name(name)
                 .password(passwordEncoder.encode(password))
-                .roles(Set.of(ROLE_USER))
+                .roles(new HashSet<>())
                 .links(new ArrayList<>())
                 .enabled(true)
                 .build();
@@ -68,7 +74,13 @@ public class UserServiceImpl implements UserService {
                     .orElseThrow(() -> new RuntimeException("OAuth 인증 정보가 존재하지 않습니다."));
 
             user.addOAuthLink(oAuthLink);
+            user.addRole(ROLE_USER);
             oAuthLinkRedisRepository.delete(oAuthLink);
+        } else {
+            String verifyCode = UUID.randomUUID().toString();
+            user.setVerifyCode(verifyCode);
+            String verifyUrl = String.format(appProperties.getVerifyUrl(), verifyCode);
+            emailService.sendMessage(EmailMessage.of(id, "[UNI Online Judge] 이메일 인증", verifyUrl));
         }
 
         userRepository.save(user);
@@ -204,6 +216,18 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new BadCredentialsException("존재하지 않는 회원입니다."));
 
         user.deleteUser();
+        userRepository.save(user);
+
+        return new APIResponse();
+    }
+
+    @Override
+    public APIResponse verifyEmail(String code) {
+
+        UserEntity user = userRepository.findByVerifyCode(code)
+                .orElseThrow(() -> new RuntimeException("존재하지 않는 인증 코드입니다."));
+
+        user.addRole(ROLE_USER);
         userRepository.save(user);
 
         return new APIResponse();
