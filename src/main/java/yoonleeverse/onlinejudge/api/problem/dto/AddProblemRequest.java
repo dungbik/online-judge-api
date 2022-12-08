@@ -29,4 +29,6 @@ public class AddProblemRequest {
     private List<ProgrammingLanguage> languages;
     @Schema(description = "문제 유형")
     private List<String> tags;
+    @Schema(description = "문제 난이도")
+    private int level;
 }

@@ -26,4 +26,5 @@ public class GetProblemResponse extends APIResponse {
     private List<TestCaseExample> testCaseExamples;
     private List<ProgrammingLanguage> languages;
     private List<Tag> tags;
+    private int level;
 }

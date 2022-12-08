@@ -32,6 +32,7 @@ public class Problem extends BaseTimeEntity {
     @DBRef private List<Tag> tags;
 
     private SubmissionHistory submissionHistory;
+    private int level;
 
     private String userId;
 

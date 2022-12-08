@@ -34,6 +34,7 @@ public class CustomProblemRepositoryImpl implements CustomProblemRepository {
         String title = req.getTitle();
         List<ProgrammingLanguage> languages = req.getLanguages();
         List<Long> tags = req.getTags();
+        List<Integer> levels = req.getLevels();
         int page = NumberUtil.toPage(req.getPage());
 
         Pageable pageable = PageRequest.of(page, PROBLEM_MAX_SIZE, Sort.by(Sort.Direction.DESC, "id"));
@@ -46,6 +47,9 @@ public class CustomProblemRepositoryImpl implements CustomProblemRepository {
         }
         if (!CollectionUtils.isEmpty(tags)) {
             criteria.and("tags").in(tags.stream().map((id) -> Tag.builder().id(id).build()).collect(Collectors.toList()));
+        }
+        if (!CollectionUtils.isEmpty(levels)) {
+            criteria.and("level").in(levels);
         }
 
         Query query = Query.query(criteria).with(pageable);

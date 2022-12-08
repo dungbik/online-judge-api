@@ -13,4 +13,5 @@ public class GetAllProblemRequest extends PagingRequest {
     private String title;
     private List<ProgrammingLanguage> languages;
     private List<Long> tags;
+    private List<Integer> levels;
 }
