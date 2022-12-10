@@ -282,6 +282,8 @@ public class UserServiceImpl implements UserService {
         userEntity.changePassword(passwordEncoder.encode(password));
         userRepository.save(userEntity);
 
+        resetCodeStorageRedisRepository.delete(resetCodeStorage);
+
         return new APIResponse();
     }
 
