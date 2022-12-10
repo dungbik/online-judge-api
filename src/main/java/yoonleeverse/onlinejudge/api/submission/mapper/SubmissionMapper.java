@@ -6,6 +6,7 @@ import org.mapstruct.MappingConstants;
 import org.springframework.data.domain.Page;
 import yoonleeverse.onlinejudge.api.common.dto.PagingResponse;
 import yoonleeverse.onlinejudge.api.submission.dto.RunResult;
+import yoonleeverse.onlinejudge.api.submission.dto.SubmissionVO;
 import yoonleeverse.onlinejudge.api.submission.dto.SubmitProblemRequest;
 import yoonleeverse.onlinejudge.api.submission.entity.JudgeResult;
 import yoonleeverse.onlinejudge.api.submission.entity.JudgeStatus;
@@ -24,12 +25,14 @@ public interface SubmissionMapper {
     @Mapping(target = "status", expression = "java(JudgeStatus.PENDING)")
     @Mapping(target = "codeLength", expression = "java(source.getCode().length())")
     @Mapping(target = "isJudge", source = "judge")
+    @Mapping(target = "like", expression = "java(0)")
     Submission toEntity(SubmitProblemRequest source);
 
-//    @Mapping(target = "liked", ignore = true)
-//    yoonleeverse.onlinejudge.api.submission.dto.Submission toDto(Submission source);
+    @Mapping(target = "liked", ignore = true)
+    @Mapping(target = "comments", ignore = true)
+    SubmissionVO toDto(Submission source);
 
-    List<yoonleeverse.onlinejudge.api.submission.dto.Submission> toDtoList(List<Submission> source);
+    List<SubmissionVO> toDtoList(List<Submission> source);
 
     @Mapping(target = "currentPages", expression = "java(source.getNumber() + 1)")
     PagingResponse toPageDto(Page source);

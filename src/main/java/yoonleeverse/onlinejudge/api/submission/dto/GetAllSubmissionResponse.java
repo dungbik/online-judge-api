@@ -11,5 +11,5 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = false)
 public class GetAllSubmissionResponse extends APIResponse {
     private PagingResponse page;
-    private List<Submission> submissions;
+    private List<SubmissionVO> submissions;
 }

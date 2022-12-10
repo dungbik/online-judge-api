@@ -3,7 +3,8 @@ package yoonleeverse.onlinejudge.api.submission.dto;
 import lombok.Data;
 
 @Data
-public class AddLikeRequest {
+public class AddCommentRequest {
 
     private String submissionId;
+    private String content;
 }

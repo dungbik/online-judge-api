@@ -5,9 +5,10 @@ import yoonleeverse.onlinejudge.api.problem.entity.ProgrammingLanguage;
 import yoonleeverse.onlinejudge.api.submission.entity.JudgeStatus;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
-public class Submission {
+public class SubmissionVO {
     private String id;
     private String userId;
     private long problemId;
@@ -21,4 +22,5 @@ public class Submission {
     private Integer codeLength;
     private int like;
     private boolean isLiked;
+    private List<CommentVO> comments;
 }

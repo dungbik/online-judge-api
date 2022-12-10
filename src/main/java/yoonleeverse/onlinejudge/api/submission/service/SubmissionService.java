@@ -9,7 +9,13 @@ public interface SubmissionService {
 
     GetAllSubmissionResponse getAllSubmission(UserPrincipal userPrincipal, GetAllSubmissionRequest req);
 
-    APIResponse addLike(String email, AddLikeRequest req);
+    APIResponse addLike(String email, String submissionId);
 
-    APIResponse removeLike(String email, AddLikeRequest req);
+    APIResponse removeLike(String email, String submissionId);
+
+    APIResponse addComment(String email, AddCommentRequest req);
+
+    APIResponse removeComment(String email, String commentId);
+
+    APIResponse updateComment(String email, UpdateCommentRequest req);
 }
