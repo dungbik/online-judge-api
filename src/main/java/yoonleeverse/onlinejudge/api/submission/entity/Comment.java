@@ -17,14 +17,14 @@ public class Comment extends BaseTimeEntity {
     private String content;
     private String submissionId;
     private String userId;
-    private boolean isDeleted;
+    private boolean deleted;
 
     public static Comment of(String content, String submissionId, String userId) {
         return new Comment(null, content, submissionId, userId, false);
     }
 
     public void delete() {
-        this.isDeleted = true;
+        this.deleted = true;
     }
 
     public void update(String content) {
