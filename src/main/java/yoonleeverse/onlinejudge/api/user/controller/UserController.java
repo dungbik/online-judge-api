@@ -113,9 +113,9 @@ public class UserController {
 
     @Operation(summary = "비밀번호 재설정 링크 전송")
     @PostMapping("/password/reset")
-    public APIResponse sendResetPasswordLink(@RequestParam @Email @NotEmpty String email) {
+    public APIResponse sendResetPasswordLink(@RequestBody @Valid SendResetLinkRequest request) {
 
-        return userService.sendResetPasswordLink(email);
+        return userService.sendResetPasswordLink(request.getEmail());
     }
 
     @Operation(summary = "비밀번호 재설정 코드 유효성 체크")
@@ -127,10 +127,9 @@ public class UserController {
 
     @Operation(summary = "비밀번호 재설정")
     @PatchMapping("/password/reset")
-    public APIResponse resetPassword(@RequestParam @NotEmpty String code,
-                                     @RequestParam @Size(min = 6, max = 20) String password) {
+    public APIResponse resetPassword(@RequestBody @Valid ResetPasswordRequest request) {
 
-        return userService.resetPassword(code, password);
+        return userService.resetPassword(request.getCode(), request.getPassword());
     }
 
 }
