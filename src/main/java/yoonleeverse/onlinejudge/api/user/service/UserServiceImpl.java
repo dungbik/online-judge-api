@@ -52,13 +52,7 @@ public class UserServiceImpl implements UserService {
         boolean isOAuth = StringUtils.isNotEmpty(linkKey);
 
         if (!isOAuth) {
-            if (userRepository.existsById(email)) {
-                throw new RuntimeException("이미 사용중인 Email 입니다.");
-            }
-
-            if (userRepository.existsByOAuthEmail(email)) {
-                throw new RuntimeException("이미 사용중인 Email 입니다.");
-            }
+            validateEmail(email);
         }
 
         if (!userComponent.checkName(name)) {
@@ -238,4 +232,17 @@ public class UserServiceImpl implements UserService {
         return new APIResponse();
     }
 
+    private void validateEmail(String email) {
+        if (StringUtils.isEmpty(email)) {
+            throw new RuntimeException("올바르지 않은 Email 입니다.");
+        }
+
+        if (userRepository.existsById(email)) {
+            throw new RuntimeException("이미 사용중인 Email 입니다.");
+        }
+
+        if (userRepository.existsByOAuthEmail(email)) {
+            throw new RuntimeException("이미 사용중인 Email 입니다.");
+        }
+    }
 }
