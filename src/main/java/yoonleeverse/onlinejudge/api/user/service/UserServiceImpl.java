@@ -103,20 +103,21 @@ public class UserServiceImpl implements UserService {
     @Override
     public SignInResponse signIn(HttpServletResponse response, SignInRequest req) {
 
-        String id = req.getId();
+        String email = req.getEmail();
         String password = req.getPassword();
         String linkKey = req.getLinkKey();
+        boolean isOAuth = StringUtils.isNotEmpty(linkKey);
 
         UserEntity user;
 
-        if (StringUtils.isNotEmpty(linkKey)) {
+        if (isOAuth) {
             OAuthLink oAuthLink = oAuthLinkRedisRepository.findById(linkKey)
                     .orElseThrow(() -> new RuntimeException("OAuth 인증 정보가 존재하지 않습니다."));
 
             user = userRepository.findByProviderAndUserId(oAuthLink.getProvider(), oAuthLink.getUserId())
                     .orElseThrow(() -> new BadCredentialsException("존재하지 않는 회원입니다."));
         } else {
-            user = userRepository.findById(id)
+            user = userRepository.findById(email)
                     .orElseThrow(() -> new BadCredentialsException("존재하지 않는 회원입니다."));
 
             if (!passwordEncoder.matches(password, user.getPassword())) {

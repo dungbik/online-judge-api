@@ -8,9 +8,9 @@ import javax.validation.constraints.Size;
 @Data
 public class SignInRequest {
 
-    @Schema(example = "test1234", description = "아이디")
+    @Schema(example = "test1234@naver.com", description = "이메일")
 //    @Size(min = 5, max = 20)
-    private String id;
+    private String email;
 
     @Schema(example = "test1234", description = "비밀번호")
 //    @Size(min = 6, max = 20)
