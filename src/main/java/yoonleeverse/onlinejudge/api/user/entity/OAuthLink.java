@@ -16,7 +16,6 @@ public class OAuthLink implements Serializable {
 
     // Redis 에만 사용되는 필드
     @Id private String id;
-    private Boolean newUser;
 
     // Mongo, Redis 모두에서 사용되는 필드
     private String provider;
@@ -25,6 +24,6 @@ public class OAuthLink implements Serializable {
     private String avatarUrl;
 
     public static OAuthLink of(OAuthLink oAuthLink) {
-        return new OAuthLink(null, null, oAuthLink.getProvider(), oAuthLink.getUserId(), oAuthLink.getEmail(), oAuthLink.getAvatarUrl());
+        return new OAuthLink(null, oAuthLink.getProvider(), oAuthLink.getUserId(), oAuthLink.getEmail(), oAuthLink.getAvatarUrl());
     }
 }

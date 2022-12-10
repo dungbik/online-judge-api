@@ -51,14 +51,14 @@ public class UserComponent {
     /**
      * 토큰 발급
      * @param response HttpServletResponse
-     * @param id ID
+     * @param email Email
      * @return accessToken
      */
-    public String issueToken(HttpServletResponse response, String id) {
-        String accessToken = authTokenProvider.createAccessToken(id);
-        String refreshToken = authTokenProvider.createRefreshToken(id);
+    public String issueToken(HttpServletResponse response, String email) {
+        String accessToken = authTokenProvider.createAccessToken(email);
+        String refreshToken = authTokenProvider.createRefreshToken(email);
 
-        TokenStorage tokenStorage = new TokenStorage(refreshToken, id);
+        TokenStorage tokenStorage = new TokenStorage(refreshToken, email);
         tokenStorageRedisRepository.save(tokenStorage);
 
         int refreshTokenExp = (int) appProperties.getAuth().getRefreshTokenExp();

@@ -30,7 +30,7 @@ public class SubmissionServiceImpl implements SubmissionService {
         validateSubmitProblemReq(req);
 
         Submission submission = this.submissionMapper.toEntity(req);
-        submission.setUserId(userPrincipal.getId());
+        submission.setUserId(userPrincipal.getEmail());
         this.submissionRepository.save(submission);
 
         this.judgeService.judge(submission);

@@ -45,23 +45,28 @@ public class UserServiceImpl implements UserService {
     @Override
     public SignUpResponse signUp(HttpServletResponse response, SignUpRequest req) {
 
-        String id = req.getId();
+        String email = req.getEmail();
         String password = req.getPassword();
         String name = req.getName();
         String linkKey = req.getLinkKey();
+        boolean isOAuth = StringUtils.isNotEmpty(linkKey);
 
-        boolean isExistId = userRepository.findById(id).isPresent();
-        if (isExistId) {
-            throw new RuntimeException("이미 사용중인 ID 입니다.");
+        if (!isOAuth) {
+            if (userRepository.existsById(email)) {
+                throw new RuntimeException("이미 사용중인 Email 입니다.");
+            }
+
+            if (userRepository.existsByOAuthEmail(email)) {
+                throw new RuntimeException("이미 사용중인 Email 입니다.");
+            }
         }
 
-        boolean checkName = userComponent.checkName(name);
-        if (!checkName) {
+        if (!userComponent.checkName(name)) {
             throw new RuntimeException("사용할 수 없는 닉네임입니다.");
         }
 
         UserEntity user = UserEntity.builder()
-                .id(id)
+                .email(email)
                 .name(name)
                 .password(passwordEncoder.encode(password))
                 .roles(new HashSet<>())
@@ -69,23 +74,23 @@ public class UserServiceImpl implements UserService {
                 .enabled(true)
                 .build();
 
-        if (StringUtils.isNotEmpty(linkKey)) {
+        if (isOAuth) {
             OAuthLink oAuthLink = oAuthLinkRedisRepository.findById(linkKey)
                     .orElseThrow(() -> new RuntimeException("OAuth 인증 정보가 존재하지 않습니다."));
 
-            user.addOAuthLink(oAuthLink);
+            user.addOAuthLink(OAuthLink.of(oAuthLink));
             user.addRole(ROLE_USER);
             oAuthLinkRedisRepository.delete(oAuthLink);
         } else {
             String verifyCode = UUID.randomUUID().toString();
             user.setVerifyCode(verifyCode);
             String verifyUrl = String.format(appProperties.getVerifyUrl(), verifyCode);
-            emailService.sendMessage(EmailMessage.of(id, "[UNI Online Judge] 이메일 인증", verifyUrl));
+            emailService.sendMessage(EmailMessage.of(email, "[UNI Online Judge] 이메일 인증", verifyUrl));
         }
 
         userRepository.save(user);
 
-        String accessToken = userComponent.issueToken(response, id);
+        String accessToken = userComponent.issueToken(response, email);
 
         return SignUpResponse.ofSuccess(accessToken);
     }
@@ -126,7 +131,7 @@ public class UserServiceImpl implements UserService {
             throw new BadCredentialsException("탈퇴한 회원입니다.");
         }
 
-        String accessToken = userComponent.issueToken(response, user.getId());
+        String accessToken = userComponent.issueToken(response, user.getEmail());
 
         return SignInResponse.ofSuccess(accessToken, user);
     }
@@ -185,7 +190,7 @@ public class UserServiceImpl implements UserService {
             OAuthLink oAuthLink = oAuthLinkRedisRepository.findById(linkKey)
                     .orElseThrow(() -> new RuntimeException("OAuth 인증 정보가 존재하지 않습니다."));
 
-            user.addOAuthLink(oAuthLink);
+            user.addOAuthLink(OAuthLink.of(oAuthLink));
             oAuthLinkRedisRepository.delete(oAuthLink);
         }
 

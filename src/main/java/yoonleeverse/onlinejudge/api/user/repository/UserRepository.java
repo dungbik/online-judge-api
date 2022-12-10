@@ -17,4 +17,7 @@ public interface UserRepository extends MongoRepository<UserEntity, String>, Cus
 
     Optional<UserEntity> findByVerifyCode(String verifyCode);
 
+    @Query(value = "{ 'links' : { '$elemMatch' : { 'email' : ?0 } } }", exists = true)
+    boolean existsByOAuthEmail(String email);
+
 }

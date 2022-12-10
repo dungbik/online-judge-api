@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class UserPrincipal implements UserDetails {
     private final String name;
-    private final String id;
+    private final String email;
     private final String password;
     private final Collection<GrantedAuthority> authorities;
     private Map<String, Object> attributes;
@@ -31,7 +31,7 @@ public class UserPrincipal implements UserDetails {
 
     @Override
     public String getUsername() {
-        return id;
+        return email;
     }
 
     @Override
@@ -52,7 +52,7 @@ public class UserPrincipal implements UserDetails {
     public static UserPrincipal create(UserEntity userEntity) {
         return new UserPrincipal(
                 userEntity.getName(),
-                userEntity.getId(),
+                userEntity.getEmail(),
                 userEntity.getPassword(),
                 userEntity.getRoles().stream()
                         .map((role) -> new SimpleGrantedAuthority(role.name()))

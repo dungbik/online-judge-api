@@ -18,9 +18,8 @@ public class SignUpRequest {
     private String name;
 
     @Schema(example = "test1234@naver.com", description = "이메일")
-    @NonNull
     @Email
-    private String id;
+    private String email;
 
     @Schema(example = "test1234", description = "비밀번호")
     @NonNull

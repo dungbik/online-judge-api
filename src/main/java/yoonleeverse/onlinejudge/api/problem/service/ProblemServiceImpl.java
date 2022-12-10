@@ -35,7 +35,7 @@ public class ProblemServiceImpl implements ProblemService {
 
     @Override
     public AddProblemResponse addProblem(UserPrincipal userPrincipal, AddProblemRequest req, MultipartFile file) {
-        this.addProblem(null, req, file, userPrincipal.getId());
+        this.addProblem(null, req, file, userPrincipal.getEmail());
 
         return new AddProblemResponse();
     }
@@ -77,7 +77,7 @@ public class ProblemServiceImpl implements ProblemService {
     @Override
     public APIResponse updateProblem(UserPrincipal userPrincipal, Long id, AddProblemRequest req, MultipartFile file) {
         Problem problem = this.findProblem(id);
-        this.addProblem(problem, req, file, userPrincipal.getId());
+        this.addProblem(problem, req, file, userPrincipal.getEmail());
 
         return new APIResponse();
     }
@@ -93,9 +93,9 @@ public class ProblemServiceImpl implements ProblemService {
      * @param problem null 일 경우 새로운 문제 생성, 아닐 경우 문제 수정
      * @param req 문제를 추가하기 위한 정보
      * @param file 테스트케이스 압축파일
-     * @param userId 문제를 추가한 유저의 아이디
+     * @param email 문제를 추가한 유저의 이메일
      */
-    private void addProblem(Problem problem, AddProblemRequest req, MultipartFile file, String userId) {
+    private void addProblem(Problem problem, AddProblemRequest req, MultipartFile file, String email) {
         boolean isNew = problem == null;
         if (isNew || !problem.getTitle().equals(req.getTitle()))
             this.checkIfExistingTitle(req);
@@ -116,7 +116,7 @@ public class ProblemServiceImpl implements ProblemService {
 
         List<Tag> tags = this.addProblemFromTags(problem, req.getTags());
         problem.setTags(tags);
-        problem.setUserId(userId);
+        problem.setUserId(email);
 
         if (!isNew) {
             this.removeProblemFromTags(problem);

@@ -12,11 +12,11 @@ import java.util.Set;
 @AllArgsConstructor
 public class UserDTO {
 
-    @Schema(example = "test123", description = "ID")
-    private String id;
-
     @Schema(example = "testName", description = "name")
     private String name;
+
+    @Schema(example = "test123@naver.com", description = "Email")
+    private String email;
 
     @Schema(example = "https://avatarUrl", description = "avatarUrl")
     private String avatarUrl;

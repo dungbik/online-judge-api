@@ -14,7 +14,7 @@ import java.util.Set;
 @Document(collection = "users")
 @Builder
 public class UserEntity extends BaseTimeEntity {
-    @Id private String id;
+    @Id private String email;
     private String name;
     private String password;
     private String avatarUrl;
@@ -24,6 +24,7 @@ public class UserEntity extends BaseTimeEntity {
     private String verifyCode;
 
     public void addOAuthLink(OAuthLink oAuthLink) {
+        this.email = oAuthLink.getEmail();
         this.avatarUrl = oAuthLink.getAvatarUrl();
         this.links.add(oAuthLink);
     }

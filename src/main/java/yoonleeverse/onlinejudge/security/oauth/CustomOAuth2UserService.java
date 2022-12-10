@@ -41,10 +41,22 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         OAuth2UserInfo userInfo = OAuth2UserInfoFactory.getOAuth2UserInfo(providerType, user.getAttributes());
         Optional<UserEntity> optionalUser = userRepository.findByProviderAndUserId(providerType.name(), userInfo.getId());
 
+        String email = userInfo.getEmail();
         boolean newUser = !optionalUser.isPresent();
         String linkKey = UUID.randomUUID().toString();
-        OAuthLink oAuthLink = new OAuthLink(linkKey, newUser, providerType.name(), userInfo.getId(), userInfo.getEmail(), userInfo.getImageUrl());
+        OAuthLink oAuthLink = new OAuthLink(linkKey, providerType.name(), userInfo.getId(), email, userInfo.getImageUrl());
+
         oAuthLinkRedisRepository.save(oAuthLink);
+
+        if (newUser) {
+            UserEntity userEntity = userRepository.findById(email)
+                    .orElse(null);
+            if (userEntity != null) {
+                userEntity.addOAuthLink(OAuthLink.of(oAuthLink));
+                userRepository.save(userEntity);
+                newUser = false;
+            }
+        }
 
         return new LinkOAuth2User(user, newUser, linkKey, providerType.name());
     }

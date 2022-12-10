@@ -25,7 +25,7 @@ public class SignInResponse extends APIResponse {
         List<OAuthLinkDTO> oAuthLinkDTOS = userEntity.getLinks().stream()
                 .map((link -> new OAuthLinkDTO(link.getProvider(), link.getEmail(), link.getAvatarUrl())))
                 .collect(Collectors.toList());
-        UserDTO userDTO = new UserDTO(userEntity.getName(), userEntity.getId(), userEntity.getAvatarUrl(), oAuthLinkDTOS, userEntity.getRoles());
+        UserDTO userDTO = new UserDTO(userEntity.getName(), userEntity.getEmail(), userEntity.getAvatarUrl(), oAuthLinkDTOS, userEntity.getRoles());
 
         SignInResponse response = new SignInResponse();
         response.setSuccess(true);
