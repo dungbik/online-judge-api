@@ -5,19 +5,20 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import yoonleeverse.onlinejudge.api.common.dto.APIResponse;
 import yoonleeverse.onlinejudge.api.user.dto.*;
 import yoonleeverse.onlinejudge.api.user.service.UserService;
 import yoonleeverse.onlinejudge.security.CurrentUser;
 import yoonleeverse.onlinejudge.security.UserPrincipal;
-import io.swagger.v3.oas.annotations.Parameter;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import javax.validation.constraints.Email;
 
+@Validated
 @RestController
 @RequestMapping(path = "/users")
 @RequiredArgsConstructor
@@ -103,7 +104,7 @@ public class UserController {
 
     @Operation(summary = "이메일 중복 체크")
     @GetMapping("/email/{email}")
-    public APIResponse checkEmail(@PathVariable @Schema(description = "이메일") @Email @Valid String email) {
+    public APIResponse checkEmail(@PathVariable @Schema(description = "이메일") @Email String email) {
 
         return userService.checkEmail(email);
     }
