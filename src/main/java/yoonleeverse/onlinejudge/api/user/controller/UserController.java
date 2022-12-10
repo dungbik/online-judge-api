@@ -18,6 +18,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Size;
 
 @Validated
 @RestController
@@ -127,7 +128,7 @@ public class UserController {
     @Operation(summary = "비밀번호 재설정")
     @PatchMapping("/password/reset")
     public APIResponse resetPassword(@RequestParam @NotEmpty String code,
-                                     @RequestParam @NotEmpty String password) {
+                                     @RequestParam @Size(min = 6, max = 20) String password) {
 
         return userService.resetPassword(code, password);
     }

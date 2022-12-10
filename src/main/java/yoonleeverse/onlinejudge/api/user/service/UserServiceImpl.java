@@ -279,7 +279,7 @@ public class UserServiceImpl implements UserService {
         UserEntity userEntity = userRepository.findById(email)
                 .orElseThrow(() -> new RuntimeException("존재하지 않는 회원입니다."));
 
-        userEntity.changePassword(password);
+        userEntity.changePassword(passwordEncoder.encode(password));
         userRepository.save(userEntity);
 
         return new APIResponse();
