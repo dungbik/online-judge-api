@@ -63,8 +63,7 @@ app:
     accessTokenExp: ${ACCESS_TOKEN_EXPIRATION:3600}
     refreshTokenExp: ${REFRESH_TOKEN_EXPIRATION:1209600}
   oauth2:
-    authorizedRedirectUris:
-      - ${OAUTH_REDIRECT_URI:http://localhost:3000/oauth2/redirect}
+    authorizedRedirectUris: ${OAUTH_REDIRECT_URIS:http://localhost:3000/oauth2/redirect}
   verify-url: ${FRONT_DOMAIN:http://localhost}${VERIFY_URL:/verify?code=%s}
   reset-password-url: ${FRONT_DOMAIN:http://localhost}${RESET_PASSWORD_URL:/reset-password?code=%s}
 
