@@ -16,6 +16,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import javax.validation.constraints.Email;
 
 @RestController
 @RequestMapping(path = "/users")
@@ -89,15 +90,22 @@ public class UserController {
     @PreAuthorize("isAuthenticated() and not hasRole('ADMIN')")
     @DeleteMapping
     public APIResponse deleteUser(@CurrentUser UserPrincipal userPrincipal) {
+
         return userService.deleteUser(userPrincipal.getUsername());
     }
 
     @Operation(summary = "이메일 인증")
     @GetMapping("/verify/{code}")
     public APIResponse verifyEmail(@PathVariable @Schema(description = "인증 코드") String code) {
+
         return userService.verifyEmail(code);
     }
 
+    @Operation(summary = "이메일 중복 체크")
+    @GetMapping("/email/{email}")
+    public APIResponse checkEmail(@PathVariable @Schema(description = "이메일") @Email String email) {
 
+        return userService.checkEmail(email);
+    }
 
 }

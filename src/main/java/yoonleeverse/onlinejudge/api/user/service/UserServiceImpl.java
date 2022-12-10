@@ -232,6 +232,13 @@ public class UserServiceImpl implements UserService {
         return new APIResponse();
     }
 
+    @Override
+    public APIResponse checkEmail(String email) {
+        validateEmail(email);
+
+        return new APIResponse();
+    }
+
     private void validateEmail(String email) {
         if (StringUtils.isEmpty(email)) {
             throw new RuntimeException("올바르지 않은 Email 입니다.");

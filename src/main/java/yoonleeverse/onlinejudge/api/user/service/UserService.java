@@ -27,4 +27,6 @@ public interface UserService {
     APIResponse deleteUser(String username);
 
     APIResponse verifyEmail(String code);
+
+    APIResponse checkEmail(String email);
 }
