@@ -26,6 +26,7 @@ public class Submission extends BaseTimeEntity {
 
     private List<JudgeResult> resultList;
     private boolean isJudge;
+    private int like;
 
     public void setStatus(JudgeStatus status) {
         setStatus(status, null, null, null);
@@ -40,5 +41,13 @@ public class Submission extends BaseTimeEntity {
 
     public void setUserId(String userId) {
         this.userId = userId;
+    }
+
+    public void addLike() {
+        this.like = Math.min(Integer.MAX_VALUE, this.like + 1);
+    }
+
+    public void removeLike() {
+        this.like = Math.max(0, this.like - 1);
     }
 }

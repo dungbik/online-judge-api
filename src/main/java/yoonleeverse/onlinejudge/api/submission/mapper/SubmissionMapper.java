@@ -26,6 +26,9 @@ public interface SubmissionMapper {
     @Mapping(target = "isJudge", source = "judge")
     Submission toEntity(SubmitProblemRequest source);
 
+//    @Mapping(target = "liked", ignore = true)
+//    yoonleeverse.onlinejudge.api.submission.dto.Submission toDto(Submission source);
+
     List<yoonleeverse.onlinejudge.api.submission.dto.Submission> toDtoList(List<Submission> source);
 
     @Mapping(target = "currentPages", expression = "java(source.getNumber() + 1)")

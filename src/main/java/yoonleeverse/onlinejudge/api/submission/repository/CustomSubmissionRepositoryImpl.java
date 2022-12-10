@@ -1,6 +1,7 @@
 package yoonleeverse.onlinejudge.api.submission.repository;
 
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -13,6 +14,7 @@ import yoonleeverse.onlinejudge.api.problem.entity.ProgrammingLanguage;
 import yoonleeverse.onlinejudge.api.submission.dto.GetAllSubmissionRequest;
 import yoonleeverse.onlinejudge.api.submission.entity.Submission;
 import yoonleeverse.onlinejudge.util.NumberUtil;
+import yoonleeverse.onlinejudge.util.StringUtil;
 
 import java.util.List;
 
@@ -29,6 +31,7 @@ public class CustomSubmissionRepositoryImpl implements CustomSubmissionRepositor
         ProgrammingLanguage language = req.getLanguage();
         String userId = req.getUserId();
         boolean isRanking = req.isRanking();
+        String submissionId = req.getSubmissionId();
         int page = NumberUtil.toPage(req.getPage());
 
         Sort sort = Sort.by(Sort.Direction.DESC, "id");
@@ -39,14 +42,18 @@ public class CustomSubmissionRepositoryImpl implements CustomSubmissionRepositor
         Pageable pageable = PageRequest.of(page, SUBMISSION_MAX_SIZE, sort);
         Criteria criteria = Criteria.where("isJudge").is(true);
 
-        if (problemId != null) {
-            criteria.and("problemId").is(problemId);
-        }
-        if (language != null) {
-            criteria.and("language").is(language);
-        }
-        if (userId != null) {
-            criteria.and("userId").is(userId);
+        if (StringUtils.isNotEmpty(submissionId)) {
+            criteria.and("_id").is(submissionId);
+        } else {
+            if (problemId != null) {
+                criteria.and("problemId").is(problemId);
+            }
+            if (language != null) {
+                criteria.and("language").is(language);
+            }
+            if (userId != null) {
+                criteria.and("userId").is(userId);
+            }
         }
 
         Query query = Query.query(criteria).with(pageable);

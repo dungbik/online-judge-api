@@ -19,4 +19,6 @@ public class Submission {
     private LocalDateTime updatedAt;
     private String code;
     private Integer codeLength;
+    private int like;
+    private boolean isLiked;
 }

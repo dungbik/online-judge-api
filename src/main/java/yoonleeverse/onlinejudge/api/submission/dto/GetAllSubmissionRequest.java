@@ -23,4 +23,7 @@ public class GetAllSubmissionRequest extends PagingRequest {
     @Schema(example = "false", description = "랭킹 적용 여부")
     @JsonProperty("is_ranking")
     private boolean isRanking;
+
+    @Schema(example = "63946bd379ea8c5ace63c2a4", description = "제출 번호")
+    private String submissionId;
 }
