@@ -29,4 +29,10 @@ public interface UserService {
     APIResponse verifyEmail(String code);
 
     APIResponse checkEmail(String email);
+
+    APIResponse sendResetPasswordLink(String email);
+
+    APIResponse checkResetPasswordCode(String code);
+
+    APIResponse resetPassword(String code, String password);
 }

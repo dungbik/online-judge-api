@@ -11,9 +11,11 @@ import yoonleeverse.onlinejudge.api.common.service.EmailService;
 import yoonleeverse.onlinejudge.api.user.UserComponent;
 import yoonleeverse.onlinejudge.api.user.dto.*;
 import yoonleeverse.onlinejudge.api.user.entity.OAuthLink;
+import yoonleeverse.onlinejudge.api.user.entity.ResetCodeStorage;
 import yoonleeverse.onlinejudge.api.user.entity.TokenStorage;
 import yoonleeverse.onlinejudge.api.user.entity.UserEntity;
 import yoonleeverse.onlinejudge.api.user.repository.OAuthLinkRedisRepository;
+import yoonleeverse.onlinejudge.api.user.repository.ResetCodeStorageRedisRepository;
 import yoonleeverse.onlinejudge.api.user.repository.TokenStorageRedisRepository;
 import yoonleeverse.onlinejudge.api.user.repository.UserRepository;
 import yoonleeverse.onlinejudge.config.AppProperties;
@@ -41,6 +43,7 @@ public class UserServiceImpl implements UserService {
     private final UserComponent userComponent;
     private final EmailService emailService;
     private final AppProperties appProperties;
+    private final ResetCodeStorageRedisRepository resetCodeStorageRedisRepository;
 
     @Override
     public SignUpResponse signUp(HttpServletResponse response, SignUpRequest req) {
@@ -235,6 +238,49 @@ public class UserServiceImpl implements UserService {
     @Override
     public APIResponse checkEmail(String email) {
         validateEmail(email);
+
+        return new APIResponse();
+    }
+
+    @Override
+    public APIResponse sendResetPasswordLink(String email) {
+
+        UserEntity userEntity = userRepository.findById(email)
+                .orElse(null);
+
+        if (userEntity != null) {
+            String code = UUID.randomUUID().toString();
+            ResetCodeStorage resetCodeStorage = new ResetCodeStorage(code, email);
+            resetCodeStorageRedisRepository.save(resetCodeStorage);
+
+            String resetPasswordUrl = String.format(appProperties.getResetPasswordUrl(), code);
+            emailService.sendMessage(EmailMessage.of(email, "[UNI Online Judge] 비밀번호 재설정", resetPasswordUrl));
+        }
+
+        return new APIResponse();
+    }
+
+    @Override
+    public APIResponse checkResetPasswordCode(String code) {
+
+        resetCodeStorageRedisRepository.findById(code)
+                .orElseThrow(() -> new RuntimeException("코드가 유효하지 않습니다"));
+
+        return new APIResponse();
+    }
+
+    @Override
+    public APIResponse resetPassword(String code, String password) {
+
+        ResetCodeStorage resetCodeStorage = resetCodeStorageRedisRepository.findById(code)
+                .orElseThrow(() -> new RuntimeException("코드가 유효하지 않습니다"));
+
+        String email = resetCodeStorage.getUserId();
+        UserEntity userEntity = userRepository.findById(email)
+                .orElseThrow(() -> new RuntimeException("존재하지 않는 회원입니다."));
+
+        userEntity.changePassword(password);
+        userRepository.save(userEntity);
 
         return new APIResponse();
     }

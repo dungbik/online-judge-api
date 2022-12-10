@@ -17,6 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import javax.validation.constraints.Email;
+import javax.validation.constraints.NotEmpty;
 
 @Validated
 @RestController
@@ -107,6 +108,28 @@ public class UserController {
     public APIResponse checkEmail(@PathVariable @Schema(description = "이메일") @Email String email) {
 
         return userService.checkEmail(email);
+    }
+
+    @Operation(summary = "비밀번호 재설정 링크 전송")
+    @PostMapping("/password/reset")
+    public APIResponse sendResetPasswordLink(@RequestParam @Email @NotEmpty String email) {
+
+        return userService.sendResetPasswordLink(email);
+    }
+
+    @Operation(summary = "비밀번호 재설정 코드 유효성 체크")
+    @GetMapping("/password/reset/{code}")
+    public APIResponse checkResetPasswordCode(@PathVariable @NotEmpty String code) {
+
+        return userService.checkResetPasswordCode(code);
+    }
+
+    @Operation(summary = "비밀번호 재설정")
+    @PatchMapping("/password/reset")
+    public APIResponse resetPassword(@RequestParam @NotEmpty String code,
+                                     @RequestParam @NotEmpty String password) {
+
+        return userService.resetPassword(code, password);
     }
 
 }
