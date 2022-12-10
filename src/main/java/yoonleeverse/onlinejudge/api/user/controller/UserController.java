@@ -103,7 +103,7 @@ public class UserController {
 
     @Operation(summary = "이메일 중복 체크")
     @GetMapping("/email/{email}")
-    public APIResponse checkEmail(@PathVariable @Schema(description = "이메일") @Email String email) {
+    public APIResponse checkEmail(@PathVariable @Schema(description = "이메일") @Email @Valid String email) {
 
         return userService.checkEmail(email);
     }
