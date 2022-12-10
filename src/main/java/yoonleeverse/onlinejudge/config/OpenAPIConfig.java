@@ -34,6 +34,10 @@ public class OpenAPIConfig {
         alphaServer.setUrl("https://online-judge-api.yoonleeverse.com");
         alphaServer.setDescription("alpha server");
 
+        Server localServer = new Server();
+        localServer.setUrl("http://localhost:8080");
+        localServer.setDescription("local server");
+
         return new OpenAPI()
                 .info(new Info()
                         .title("Online Judge API Doc")
@@ -52,7 +56,7 @@ public class OpenAPIConfig {
                                         .name(Constants.Cookie.REFRESH_TOKEN)
                         )
                 )
-                .servers(List.of(alphaServer));
+                .servers(List.of(alphaServer, localServer));
     }
 
 }
