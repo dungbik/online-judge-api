@@ -20,8 +20,8 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(RuntimeException.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public APIResponse onSystemError(RuntimeException e) {
+    @ResponseStatus(HttpStatus.OK)
+    public APIResponse onFailedResult(RuntimeException e) {
         APIResponse response = new APIResponse();
         response.setSuccess(false);
         response.setErrMsg(e.getMessage());
