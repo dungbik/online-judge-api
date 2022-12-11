@@ -25,6 +25,6 @@ public class GetProblemResponse extends APIResponse {
     private String outputDesc;
     private List<TestCaseExample> testCaseExamples;
     private List<ProgrammingLanguage> languages;
-    private List<Tag> tags;
+    private List<TagVO> tags;
     private int level;
 }
