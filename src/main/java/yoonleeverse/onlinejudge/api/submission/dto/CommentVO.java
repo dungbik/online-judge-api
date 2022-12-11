@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 @Data
 public class CommentVO {
 
+    private String submissionId;
     private String content;
 
     private String userId;

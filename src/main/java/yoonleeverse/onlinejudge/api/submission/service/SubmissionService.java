@@ -18,4 +18,6 @@ public interface SubmissionService {
     APIResponse removeComment(String email, String commentId);
 
     APIResponse updateComment(String email, UpdateCommentRequest req);
+
+    GetAllCommentResponse getALlComment(String email, GetAllCommentRequest req);
 }

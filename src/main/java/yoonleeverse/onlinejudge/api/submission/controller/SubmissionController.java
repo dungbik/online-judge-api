@@ -88,4 +88,13 @@ public class SubmissionController {
         return submissionService.updateComment(userPrincipal.getEmail(), req);
     }
 
+    @Operation(summary = "작성한 댓글 조회", security = { @SecurityRequirement(name = "Bearer") })
+    @GetMapping("/comments")
+    @PreAuthorize("hasRole('USER')")
+    public GetAllCommentResponse getAllComment(@CurrentUser UserPrincipal userPrincipal,
+                                               GetAllCommentRequest req) {
+
+        return submissionService.getALlComment(userPrincipal.getEmail(), req);
+    }
+
 }
