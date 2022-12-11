@@ -8,6 +8,7 @@ import yoonleeverse.onlinejudge.api.common.constant.MongoDB;
 import yoonleeverse.onlinejudge.api.common.dto.APIResponse;
 import yoonleeverse.onlinejudge.api.common.repository.CounterRepository;
 import yoonleeverse.onlinejudge.api.common.service.StorageService;
+import yoonleeverse.onlinejudge.api.problem.dto.GetAllTagResponse;
 import yoonleeverse.onlinejudge.api.problem.dto.*;
 import yoonleeverse.onlinejudge.api.problem.entity.*;
 import yoonleeverse.onlinejudge.api.problem.mapper.ProblemMapper;
@@ -80,6 +81,15 @@ public class ProblemServiceImpl implements ProblemService {
         this.addProblem(problem, req, file, userPrincipal.getEmail());
 
         return new APIResponse();
+    }
+
+    @Override
+    public GetAllTagResponse getAllTag() {
+        List<TagVO> tags = tagRepository.findAll().stream()
+                .map(e -> TagVO.of(e.getId(), e.getName()))
+                .collect(Collectors.toList());
+
+        return new GetAllTagResponse(tags);
     }
 
     private Problem findProblem(Long id) {
