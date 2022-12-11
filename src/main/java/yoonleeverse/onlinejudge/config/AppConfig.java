@@ -41,7 +41,6 @@ public class AppConfig {
                 String hostName = InetAddress.getLocalHost().getHostName();
                 Integer port = this.environment.getProperty("server.port", Integer.class);
                 if (port == null) {
-                    System.out.println("hi");
                     port = 8080;
                 }
 

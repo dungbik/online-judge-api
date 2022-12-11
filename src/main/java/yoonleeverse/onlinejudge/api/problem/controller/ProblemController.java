@@ -2,6 +2,7 @@ package yoonleeverse.onlinejudge.api.problem.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -14,6 +15,7 @@ import yoonleeverse.onlinejudge.api.problem.service.ProblemService;
 import yoonleeverse.onlinejudge.security.CurrentUser;
 import yoonleeverse.onlinejudge.security.UserPrincipal;
 
+@Tag(name = "problem", description = "problem API")
 @RestController
 @RequestMapping("/problems")
 @RequiredArgsConstructor

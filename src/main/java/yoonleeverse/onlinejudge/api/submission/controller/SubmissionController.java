@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -16,6 +17,7 @@ import yoonleeverse.onlinejudge.security.UserPrincipal;
 
 import java.util.Map;
 
+@Tag(name = "submission", description = "submission API")
 @RestController
 @RequestMapping("/submissions")
 @RequiredArgsConstructor
@@ -59,7 +61,7 @@ public class SubmissionController {
         return submissionService.removeLike(userPrincipal.getEmail(), submissionId);
     }
 
-    @Operation(summary = "댓글 작성", security = { @SecurityRequirement(name = "Bearer") })
+    @Operation(summary = "댓글 작성",  security = { @SecurityRequirement(name = "Bearer") })
     @PostMapping("/comments")
     @PreAuthorize("hasRole('USER')")
     public APIResponse addComment(@CurrentUser UserPrincipal userPrincipal,
@@ -85,6 +87,5 @@ public class SubmissionController {
 
         return submissionService.updateComment(userPrincipal.getEmail(), req);
     }
-
 
 }

@@ -1,3 +1,10 @@
+springdoc:
+  swagger-ui:
+    tags-sorter: alpha
+    operations-sorter: alpha
+    path: /swagger
+    persist-authorization: true
+
 spring:
   security:
     oauth2.client:
@@ -66,11 +73,6 @@ app:
     authorizedRedirectUris: ${OAUTH_REDIRECT_URIS:http://localhost:3000/oauth2/redirect}
   verify-url: ${FRONT_DOMAIN:http://localhost}${VERIFY_URL:/verify?code=%s}
   reset-password-url: ${FRONT_DOMAIN:http://localhost}${RESET_PASSWORD_URL:/reset-password?code=%s}
-
-springdoc:
-  swagger-ui:
-    tagsSorter: alpha
-    operationsSorter: method
 
 logging:
   level:
