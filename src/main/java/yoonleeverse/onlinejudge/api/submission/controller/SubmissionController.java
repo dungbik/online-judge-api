@@ -3,7 +3,6 @@ package yoonleeverse.onlinejudge.api.submission.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -59,6 +58,15 @@ public class SubmissionController {
                                   @PathVariable String submissionId) {
 
         return submissionService.removeLike(userPrincipal.getEmail(), submissionId);
+    }
+
+    @Operation(summary = "좋아요 이력 조회", security = { @SecurityRequirement(name = "Bearer") })
+    @GetMapping("/like")
+    @PreAuthorize("hasRole('USER')")
+    public GetAllLikeResponse getAllLike(@CurrentUser UserPrincipal userPrincipal,
+                                         GetAllLikeRequest req) {
+
+        return submissionService.getAllLike(userPrincipal.getEmail(), req);
     }
 
     @Operation(summary = "댓글 작성",  security = { @SecurityRequirement(name = "Bearer") })

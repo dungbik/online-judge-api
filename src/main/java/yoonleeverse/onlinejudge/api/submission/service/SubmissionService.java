@@ -20,4 +20,6 @@ public interface SubmissionService {
     APIResponse updateComment(String email, UpdateCommentRequest req);
 
     GetAllCommentResponse getALlComment(String email, GetAllCommentRequest req);
+
+    GetAllLikeResponse getAllLike(String email, GetAllLikeRequest req);
 }

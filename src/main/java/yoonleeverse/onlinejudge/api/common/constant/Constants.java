@@ -5,6 +5,7 @@ public class Constants {
     public static final int PROBLEM_MAX_SIZE = 10;
     public static final int SUBMISSION_MAX_SIZE = 10;
     public static final int COMMENT_MAX_SIZE = 10;
+    public static final int LIKE_MAX_SIZE = 10;
 
     public enum ERole {
         ROLE_USER,

@@ -87,7 +87,7 @@ public class SubmissionServiceImpl implements SubmissionService {
         Submission submission = submissionRepository.findById(submissionId)
                 .orElseThrow(() -> new RuntimeException("존재하지 않는 제출 이력입니다."));
 
-        likeRepository.save(new Like(null, email, submissionId));
+        likeRepository.save(Like.of(email, submissionId));
 
         submission.addLike();
         submissionRepository.save(submission);
@@ -180,6 +180,20 @@ public class SubmissionServiceImpl implements SubmissionService {
         return response;
     }
 
+    @Override
+    public GetAllLikeResponse getAllLike(String email, GetAllLikeRequest req) {
+
+        Page<LikeVO> likePage = likeRepository.getAllLike(email, req);
+
+        GetAllLikeResponse response = new GetAllLikeResponse();
+        response.setPage(submissionMapper.toPageDto(likePage));
+
+        if (!likePage.isEmpty()) {
+            response.setLikes(likePage.getContent());
+        }
+
+        return response;
+    }
 
     private void validateSubmitProblemReq(SubmitProblemRequest req) {
         long problemId = req.getProblemId();

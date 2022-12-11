@@ -16,6 +16,10 @@ public class Like extends BaseTimeEntity {
     @Id private String id;
     private String userId;
     private String submissionId;
+
+    public static Like of(String userId, String submissionId) {
+        return new Like(null, userId, submissionId);
+    }
 }
 
 
