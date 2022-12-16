@@ -24,7 +24,10 @@ public class UserEntity extends BaseTimeEntity {
     private String verifyCode;
 
     public void addOAuthLink(OAuthLink oAuthLink) {
-        this.email = oAuthLink.getEmail();
+        if (this.links.size() == 0) {
+            this.email = oAuthLink.getEmail();
+        }
+
         this.avatarUrl = oAuthLink.getAvatarUrl();
         this.links.add(oAuthLink);
     }
