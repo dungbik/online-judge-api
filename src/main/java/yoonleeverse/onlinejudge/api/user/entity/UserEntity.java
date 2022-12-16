@@ -2,6 +2,7 @@ package yoonleeverse.onlinejudge.api.user.entity;
 
 import lombok.Builder;
 import lombok.Getter;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import yoonleeverse.onlinejudge.api.common.constant.Constants;
@@ -24,7 +25,7 @@ public class UserEntity extends BaseTimeEntity {
     private String verifyCode;
 
     public void addOAuthLink(OAuthLink oAuthLink) {
-        if (this.links.size() == 0) {
+        if (StringUtils.isEmpty(this.email)) {
             this.email = oAuthLink.getEmail();
         }
 
