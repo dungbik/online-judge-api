@@ -2,6 +2,9 @@ package yoonleeverse.onlinejudge.api.user.service;
 
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.boot.web.server.Cookie.SameSite;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -150,7 +153,15 @@ public class UserServiceImpl implements UserService {
             tokenStorageRedisRepository.deleteByUserId(userPrincipal.getUsername());
         }
 
-        CookieUtil.deleteCookie(request, response, REFRESH_TOKEN);
+        ResponseCookie cookie = ResponseCookie.from(REFRESH_TOKEN, "")
+                .httpOnly(true)
+                .path("/")
+                .maxAge(0)
+                .sameSite(SameSite.NONE.name())
+                .secure(true)
+                .build();
+
+        response.setHeader(HttpHeaders.SET_COOKIE, cookie.toString());
 
         return new APIResponse();
     }
