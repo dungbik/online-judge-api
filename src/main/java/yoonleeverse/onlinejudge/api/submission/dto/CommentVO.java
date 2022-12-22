@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 public class CommentVO {
 
     private String submissionId;
+    private String commentId;
     private String content;
 
     private String userId;

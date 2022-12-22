@@ -66,7 +66,7 @@ public class SubmissionServiceImpl implements SubmissionService {
                     response.getSubmissions().get(0).setLiked(isLiked);
                 }
                 List<CommentVO> comments = commentRepository.findAllBySubmissionIdAndDeleted(submissionId, false).stream()
-                        .map((e) -> new CommentVO(null, e.getContent(), e.getUserId(), e.getCreatedAt()))
+                        .map((e) -> new CommentVO(null, e.getId(), e.getContent(), e.getUserId(), e.getCreatedAt()))
                         .collect(Collectors.toList());
                 response.getSubmissions().get(0).setComments(comments);
             }
@@ -172,7 +172,7 @@ public class SubmissionServiceImpl implements SubmissionService {
 
         if (!commentPage.isEmpty()) {
             List<CommentVO> comments = commentPage.getContent().stream()
-                    .map((e) -> new CommentVO(e.getSubmissionId(), e.getContent(), e.getUserId(), e.getCreatedAt()))
+                    .map((e) -> new CommentVO(e.getSubmissionId(), e.getId(), e.getContent(), e.getUserId(), e.getCreatedAt()))
                     .collect(Collectors.toList());
             response.setComments(comments);
         }
