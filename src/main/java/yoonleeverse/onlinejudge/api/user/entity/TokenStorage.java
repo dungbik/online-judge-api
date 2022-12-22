@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;
+import org.springframework.data.redis.core.index.Indexed;
 
 import java.io.Serializable;
 
@@ -13,6 +14,6 @@ import java.io.Serializable;
 @AllArgsConstructor
 @RedisHash(value = "TokenStorage", timeToLive = 14 * 24 * 60 * 60)
 public class TokenStorage implements Serializable {
-    @Id private String refreshToken;
-    private String userId;
+    @Id private String id;
+    @Indexed private String userId;
 }

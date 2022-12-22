@@ -147,7 +147,7 @@ public class UserServiceImpl implements UserService {
     public APIResponse signOut(HttpServletRequest request, HttpServletResponse response, UserPrincipal userPrincipal) {
 
         if (userPrincipal != null) {
-            tokenStorageRedisRepository.deleteById(userPrincipal.getUsername());
+            tokenStorageRedisRepository.deleteByUserId(userPrincipal.getUsername());
         }
 
         CookieUtil.deleteCookie(request, response, REFRESH_TOKEN);
