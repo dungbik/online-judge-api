@@ -94,6 +94,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         config.setAllowedOriginPatterns(List.of("*"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowedMethods(List.of("*"));
+        config.setExposedHeaders(List.of("*"));
         source.registerCorsConfiguration("/**", config);
 
         return source;
