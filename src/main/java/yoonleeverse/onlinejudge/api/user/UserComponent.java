@@ -69,6 +69,7 @@ public class UserComponent {
                 .maxAge(refreshTokenExp)
                 .sameSite(Cookie.SameSite.NONE.name())
                 .secure(true)
+                .domain("localhost")
                 .build();
 
         response.setHeader(HttpHeaders.SET_COOKIE, cookie.toString());
