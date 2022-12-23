@@ -1,6 +1,7 @@
 package yoonleeverse.onlinejudge.api.user.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.web.server.Cookie.SameSite;
 import org.springframework.http.HttpHeaders;
@@ -35,6 +36,7 @@ import java.util.UUID;
 import static yoonleeverse.onlinejudge.api.common.constant.Constants.Cookie.REFRESH_TOKEN;
 import static yoonleeverse.onlinejudge.api.common.constant.Constants.ERole.ROLE_USER;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
@@ -171,6 +173,7 @@ public class UserServiceImpl implements UserService {
 
         Cookie cookie = CookieUtil.getCookie(request, REFRESH_TOKEN)
                 .orElse(null);
+        log.debug("refreshToken cookie[{}]", cookie);
         if (cookie == null) {
             return RefreshTokenResponse.ofFail();
         }
@@ -178,11 +181,13 @@ public class UserServiceImpl implements UserService {
         String oldRefreshToken = cookie.getValue();
         TokenStorage oldTokenStorage = tokenStorageRedisRepository.findById(oldRefreshToken)
                 .orElse(null);
+        log.debug("refreshToken oldTokenStorage[{}]", oldTokenStorage);
         if (oldTokenStorage == null) {
             return RefreshTokenResponse.ofFail();
         }
 
         String id = oldTokenStorage.getUserId();
+        log.debug("refreshToken id[{}]", id);
         tokenStorageRedisRepository.delete(oldTokenStorage);
         String accessToken = userComponent.issueToken(response, id);
 
