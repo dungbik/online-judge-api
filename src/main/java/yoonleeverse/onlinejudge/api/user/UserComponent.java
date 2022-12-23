@@ -64,7 +64,7 @@ public class UserComponent {
         int refreshTokenExp = (int) appProperties.getAuth().getRefreshTokenExp();
 
         ResponseCookie cookie = ResponseCookie.from(REFRESH_TOKEN, refreshToken)
-                .httpOnly(false)
+                .httpOnly(true)
                 .path("/")
                 .maxAge(refreshTokenExp)
                 .sameSite(Cookie.SameSite.NONE.name())
