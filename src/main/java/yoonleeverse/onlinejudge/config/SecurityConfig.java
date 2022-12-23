@@ -93,8 +93,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         config.setAllowCredentials(true);
         config.setAllowedOriginPatterns(List.of("https://*.yoonleeverse.com"));
         config.setAllowedHeaders(List.of("*"));
-        config.setAllowedMethods(List.of("*"));
-        config.setExposedHeaders(List.of("*"));
+        config.setAllowedMethods(List.of("POST", "GET", "PUT", "OPTIONS", "DELETE", "HEAD"));
+        config.setExposedHeaders(List.of("Set-Cookie"));
         source.registerCorsConfiguration("/**", config);
 
         return source;
