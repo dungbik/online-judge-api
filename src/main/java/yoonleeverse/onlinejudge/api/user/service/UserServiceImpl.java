@@ -151,10 +151,6 @@ public class UserServiceImpl implements UserService {
     @Override
     public APIResponse signOut(HttpServletRequest request, HttpServletResponse response, UserPrincipal userPrincipal) {
 
-        if (userPrincipal != null) {
-            tokenStorageRedisRepository.deleteByUserId(userPrincipal.getUsername());
-        }
-
         ResponseCookie cookie = ResponseCookie.from(REFRESH_TOKEN, "")
                 .httpOnly(true)
                 .path("/")
