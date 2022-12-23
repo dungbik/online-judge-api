@@ -69,7 +69,7 @@ public class UserComponent {
                 .maxAge(refreshTokenExp)
                 .sameSite(Cookie.SameSite.NONE.name())
                 .secure(true)
-                .domain("localhost")
+                .domain("yoonleeverse.com")
                 .build();
 
         response.setHeader(HttpHeaders.SET_COOKIE, cookie.toString());
