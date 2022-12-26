@@ -157,7 +157,7 @@ public class UserServiceImpl implements UserService {
                 .maxAge(0)
                 .sameSite(SameSite.NONE.name())
                 .secure(true)
-                .domain("yoonleeverse.com")
+//                .domain("yoonleeverse.com")
                 .build();
 
         response.setHeader(HttpHeaders.SET_COOKIE, cookie.toString());
