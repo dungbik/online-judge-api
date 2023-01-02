@@ -115,11 +115,12 @@ public class JudgeServiceImpl implements JudgeService {
                             .collect(Collectors.toMap(e -> e.getId(), e -> e.getOutputMD5()));
                     if ((resultList.size() - 1) == testCases.size()) {
                         ok = true;
-                        for (JudgeResult result : resultList) {
-                            if (result.getId() == 0
-                                    || testCaseMap.get(result.getId()).equalsIgnoreCase(result.getOutputMD5())) {
+                        resultList.get(0).setCorrect(true);
+                        for (JudgeResult result : resultList.subList(1, testCases.size() - 1)) {
+                            if (testCaseMap.get(result.getId()).equalsIgnoreCase(result.getOutputMD5())) {
                                 result.setCorrect(true);
                             } else {
+                                result.setCorrect(false);
                                 ok = false;
                             }
                         }
@@ -133,7 +134,9 @@ public class JudgeServiceImpl implements JudgeService {
                     }
                     if (ok) {
                         submission.setStatus(JudgeStatus.SUCCESS, maxMemory, maxRealTime, resultList);
-                        this.problemRepository.addSuccessCount(submission.getProblemId());
+                        if (submission.isJudge()) {
+                            this.problemRepository.addSuccessCount(submission.getProblemId());
+                        }
                     } else {
                         submission.setStatus(JudgeStatus.WRONG_ANSWER, maxMemory, maxRealTime, resultList);
                     }
