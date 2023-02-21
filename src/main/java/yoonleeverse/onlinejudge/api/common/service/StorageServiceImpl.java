@@ -114,6 +114,9 @@ public class StorageServiceImpl implements StorageService {
                 }
                 int id = Integer.parseInt(splitName[0]);
                 String str = new String(zis.readAllBytes(), StandardCharsets.UTF_8);
+                if (StringUtils.hasText(str)) {
+                    str = str.trim();
+                }
                 log.debug("[unzipTestCase] id[{}] str[{}] isIn[{}] isOut[{}]", id, str, isIn, isOut);
                 TestCase testCase = testCaseMap.getOrDefault(id, new TestCase(id, null, null, null));
                 if (isIn) {
