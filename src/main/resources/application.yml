@@ -63,6 +63,10 @@ spring:
           timeout: 5000
           starttls:
             enable: true
+  servlet:
+    multipart:
+      max-file-size: 200MB
+      max-request-size: 200MB
 
 app:
   auth:
