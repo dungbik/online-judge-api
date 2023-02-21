@@ -113,11 +113,14 @@ public class JudgeServiceImpl implements JudgeService {
 
                     Map<Integer, String> testCaseMap = testCases.stream()
                             .collect(Collectors.toMap(e -> e.getId(), e -> e.getOutputMD5()));
+                    log.debug("[completeJudge] testCaseMap[{}] resultList[{}] testCases[{}]", testCaseMap, resultList, testCases);
                     if ((resultList.size() - 1) == testCases.size()) {
                         ok = true;
                         resultList.get(0).setCorrect(true);
-                        for (JudgeResult result : resultList.subList(1, testCases.size() - 1)) {
-                            if (testCaseMap.get(result.getId()).equalsIgnoreCase(result.getOutputMD5())) {
+                        for (JudgeResult result : resultList.subList(1, testCases.size())) {
+                            String answerMD5 = testCaseMap.get(result.getId());
+                            log.debug("[completeJudge] id[{}] answerMD5[{}] submittedMD5[{}]", result.getId(), answerMD5, result.getOutputMD5());
+                            if (answerMD5.equalsIgnoreCase(result.getOutputMD5())) {
                                 result.setCorrect(true);
                             } else {
                                 result.setCorrect(false);
