@@ -11,6 +11,7 @@ import yoonleeverse.onlinejudge.util.StringUtil;
 
 import javax.annotation.PostConstruct;
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -112,7 +113,8 @@ public class StorageServiceImpl implements StorageService {
                     continue;
                 }
                 int id = Integer.parseInt(splitName[0]);
-                String str = new String(zis.readAllBytes());
+                String str = new String(zis.readAllBytes(), StandardCharsets.UTF_8);
+                log.debug("[unzipTestCase] id[{}] str[{}] isIn[{}] isOut[{}]", id, str, isIn, isOut);
                 TestCase testCase = testCaseMap.getOrDefault(id, new TestCase(id, null, null, null));
                 if (isIn) {
                     testCase.setInput(str);
@@ -128,8 +130,8 @@ public class StorageServiceImpl implements StorageService {
                     .sorted(Comparator.comparingInt(value -> value.getId()))
                     .collect(Collectors.toList());
             return testCases;
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            log.debug("[unzipTestCase] Exception[{}]", e);
         } finally {
             try {
                 FileSystemUtils.deleteRecursively(targetPath);
