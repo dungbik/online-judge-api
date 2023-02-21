@@ -117,7 +117,7 @@ public class JudgeServiceImpl implements JudgeService {
                     if ((resultList.size() - 1) == testCases.size()) {
                         ok = true;
                         resultList.get(0).setCorrect(true);
-                        for (JudgeResult result : resultList.subList(1, testCases.size())) {
+                        for (JudgeResult result : resultList.subList(1, resultList.size())) {
                             String answerMD5 = testCaseMap.get(result.getId());
                             log.debug("[completeJudge] id[{}] answerMD5[{}] submittedMD5[{}]", result.getId(), answerMD5, result.getOutputMD5());
                             if (answerMD5.equalsIgnoreCase(result.getOutputMD5())) {
