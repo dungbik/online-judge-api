@@ -21,6 +21,8 @@ public class WebSocketMessageListener implements MessageListener {
     public void onMessage(Message message, byte[] pattern) {
 
         WebSocketMessage msg = this.jackson2JsonRedisSerializer.deserialize(message.getBody(), WebSocketMessage.class);
+        log.debug("[WebSocketMessageListener] onMessage msg[{}]", msg);
+
 
         String to = msg.getTo();
         String content = msg.getContent();
