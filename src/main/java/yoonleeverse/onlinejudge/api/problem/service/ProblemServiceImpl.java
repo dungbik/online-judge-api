@@ -121,23 +121,23 @@ public class ProblemServiceImpl implements ProblemService {
                 .collect(Collectors.toList());
         problem.setTestCaseExamples(exampleList);
 
-        List<TestCase> testCases = this.storageService.loadTestCase(file, "problem/" + problemId);
-        problem.setTestCases(testCases);
+        if (file != null) {
+            List<TestCase> testCases = this.storageService.loadTestCase(file, "problem/" + problemId);
+            problem.setTestCases(testCases);
+            if (!isNew) {
+                this.testCaseRedisRepository.delete(problemId);
+            }
+            this.testCaseRedisRepository.save(problemId, testCases);
+        }
 
         List<Tag> tags = this.addProblemFromTags(problem, req.getTags());
         problem.setTags(tags);
         problem.setUserId(email);
 
-        if (!isNew) {
-            this.removeProblemFromTags(problem);
-            this.testCaseRedisRepository.delete(problemId);
-        }
-
-        this.testCaseRedisRepository.save(problemId, testCases);
-
         if (isNew) {
             this.problemRepository.insert(problem);
         } else {
+            this.removeProblemFromTags(problem);
             this.problemRepository.save(problem);
         }
     }
