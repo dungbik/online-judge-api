@@ -91,10 +91,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
-//        config.setAllowedOriginPatterns(List.of("https://*.yoonleeverse.com"));
-        config.setAllowedOriginPatterns(List.of("*"));
+        config.setAllowedOriginPatterns(List.of("https://*.yoonleeverse.com"));
+        config.setAllowedOriginPatterns(List.of("https://localhost:3000"));
         config.setAllowedHeaders(List.of("*"));
-        config.setAllowedMethods(List.of("POST", "GET", "PUT", "OPTIONS", "DELETE", "HEAD"));
+        config.setAllowedMethods(List.of("POST", "GET", "PUT", "OPTIONS", "DELETE", "HEAD", "PATCH"));
         config.setExposedHeaders(List.of("Set-Cookie"));
         source.registerCorsConfiguration("/**", config);
 
@@ -102,7 +102,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     @Override
-    public void configure(WebSecurity web) throws Exception {
+    public void configure(WebSecurity web) {
         web.ignoring()
                 .antMatchers("/v3/api-docs")
                 .antMatchers("/v3/api-docs/*")
