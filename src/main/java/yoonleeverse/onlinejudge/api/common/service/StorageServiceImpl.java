@@ -67,6 +67,7 @@ public class StorageServiceImpl implements StorageService {
         boolean isCompressedFile = COMPRESSED_FILE_EXTENSION_LIST.stream()
                 .anyMatch(e -> extension.equalsIgnoreCase(e.name()));
         Path targetPath = this.root.resolve(path);
+        log.debug("[loadTestCase] file[{}] isCompressedFile[{}] targetPath[{}]", file, isCompressedFile, targetPath);
         if (isCompressedFile) {
             return unzipTestCase(file, targetPath);
         }
@@ -99,17 +100,20 @@ public class StorageServiceImpl implements StorageService {
         Map<Integer, TestCase> testCaseMap = new HashMap<>();
 
         File file = transferTo(multipartFile, targetPath);
+        log.debug("[unzipTestCase] file[{}]", file);
         try (ZipInputStream zis = new ZipInputStream(new FileInputStream(file))) {
             ZipEntry zipEntry;
             while ((zipEntry = zis.getNextEntry()) != null) {
                 Path newPath = zipSlipProtect(zipEntry, targetPath);
                 String[] splitName = zipEntry.getName().split("\\.");
                 if (zipEntry.isDirectory() || !newPath.getParent().toFile().exists() || splitName.length < 2) {
+                    log.debug("[unzipTestCase] isDirectory[{}] exists[{}] splitName.length[{}]", zipEntry.isDirectory(), newPath.getParent().toFile().exists(), splitName.length);
                     continue;
                 }
                 boolean isIn = splitName[1].equalsIgnoreCase("in");
                 boolean isOut = splitName[1].equalsIgnoreCase("out");
                 if (!isIn && !isOut) {
+                    log.debug("[unzipTestCase] isIn[{}] isOut[{}]", isIn, isOut);
                     continue;
                 }
                 int id = Integer.parseInt(splitName[0]);
