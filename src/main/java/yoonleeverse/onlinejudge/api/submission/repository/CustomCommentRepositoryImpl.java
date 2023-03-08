@@ -30,7 +30,8 @@ public class CustomCommentRepositoryImpl implements CustomCommentRepository {
         Sort sort = Sort.by(Sort.Direction.DESC, "createdAt");
         Pageable pageable = PageRequest.of(page, COMMENT_MAX_SIZE, sort);
 
-        Criteria criteria = Criteria.where("userId").is(email);
+        Criteria criteria = Criteria.where("userId").is(email)
+                .and("deleted").is(false);
 
         Query query = new Query(criteria).with(pageable);
         List<Comment> comments = this.mongoTemplate.find(query, Comment.class);
