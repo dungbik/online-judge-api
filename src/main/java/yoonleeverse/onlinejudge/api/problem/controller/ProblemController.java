@@ -57,7 +57,7 @@ public class ProblemController {
     public APIResponse updateProblem(@CurrentUser UserPrincipal userPrincipal,
                                      @PathVariable Long id,
                                      @RequestPart AddProblemRequest req,
-                                     @RequestPart MultipartFile file) {
+                                     @RequestPart(required = false) MultipartFile file) {
         return problemService.updateProblem(userPrincipal, id, req, file);
     }
 
